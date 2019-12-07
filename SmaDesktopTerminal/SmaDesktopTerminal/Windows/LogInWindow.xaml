@@ -1,0 +1,36 @@
+﻿<Window x:Class="SmaDesktopTerminal.Windows.LogInWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:SmaDesktopTerminal.Windows"
+        mc:Ignorable="d"
+        Title="Авторизация" Height="265" Width="450" ResizeMode="NoResize" Style="{DynamicResource WindowStyle}">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="45"></RowDefinition>
+            <RowDefinition/>
+            <RowDefinition Height="47"></RowDefinition>
+            <RowDefinition Height="48"></RowDefinition>
+
+        </Grid.RowDefinitions>
+        <TextBlock Grid.Row="0" VerticalAlignment="Center" HorizontalAlignment="Center" Height="25">Введите логин и пароль</TextBlock>
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="100"></ColumnDefinition>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition></RowDefinition>
+                <RowDefinition></RowDefinition>
+            </Grid.RowDefinitions>
+            <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="15" Height="20" Width="56" Margin="22,14,22,13"> Логин:</TextBlock>
+            <TextBox Name="loginTextBox" Grid.Row="0" Grid.Column="1" Width="300" VerticalAlignment="Center" HorizontalAlignment="Center"  Height="25"  ></TextBox>
+            <TextBlock Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Center" Height="20" Width="56" Margin="22,13,22,14">Пароль:</TextBlock>
+            <TextBox Grid.Row="1" Grid.Column="1" Name="passwordTextBox" Width="300" VerticalAlignment="Center" HorizontalAlignment="Center" Height="25" ></TextBox>
+        </Grid>
+
+        <Button x:Name="logInButton" Grid.Row="2" VerticalAlignment="Center" HorizontalAlignment="Center" Width="200" Height="34" >Войти</Button>
+        <TextBlock x:Name="authStatusTextBlock" Grid.Row="3" VerticalAlignment="Center" HorizontalAlignment="Center" TextWrapping="Wrap" ></TextBlock>
+    </Grid>
+</Window>

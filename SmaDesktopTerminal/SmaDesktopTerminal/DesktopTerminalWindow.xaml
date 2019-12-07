@@ -1,0 +1,69 @@
+﻿<Window x:Class="SmaDesktopTerminal.DesktopTerminalWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:SmaDesktopTerminal"
+        xmlns:tm="clr-namespace:SmaDesktopTerminal.Models"
+        mc:Ignorable="d"
+        Title="Sma Desktop Terminal" Height="450" Width="800" Style="{DynamicResource WindowStyle}">
+
+    <Grid x:Name="terminalMainGrid" Style="{DynamicResource MainGridStyle}" >
+        <Grid.RowDefinitions>
+            <RowDefinition Height="40"></RowDefinition>
+            <RowDefinition></RowDefinition>
+        </Grid.RowDefinitions>
+
+        <Grid Name="headerMainGrid" Grid.Row="0" >
+            <TextBlock x:Name="UserName" Height="20" VerticalAlignment="Center" Margin="20,0,387,0" Text="{Binding CurPerson.FullName}"  Style="{DynamicResource MaiTextBlockStyle}" ></TextBlock>
+        </Grid>
+        <TabControl x:Name="workWindowsTabControl" Grid.Row="1" Style="{DynamicResource MainTabControlStyle}" >
+            <TabItem Header="TabItem"  >
+                <Grid Style="{DynamicResource MainGridStyle }" >
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="200"></ColumnDefinition>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                    </Grid.RowDefinitions>
+                    <ListView Grid.Row="0" Grid.Column="0" ItemsSource="{Binding Instruments}">
+                        <ListView.View>
+                            <GridView>
+                                <!--<TextBlock Name="instrumentName">Название инструмента</TextBlock>-->
+                                <GridViewColumn  Header="Название инструмента"  >
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Grid>
+                                                <TextBlock Text="{Binding Name}" />
+                                            </Grid>
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+                                <GridViewColumn Header="bool"  >
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Grid>
+                                                <TextBlock Text="{Binding IsAllow}" />
+                                            </Grid>
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+
+                                <!--<GridViewColumn Header="Column 2" Width="200"/>
+                                <GridViewColumn Header="Column 3" Width="200"/>-->
+                            </GridView>
+                        </ListView.View>
+                        <!--<ListView.ItemsPanel>
+                            
+
+                        </ListView.ItemsPanel>-->
+                    </ListView>
+                </Grid>
+            </TabItem>
+            <TabItem Header="TabItem">
+                <Grid Style="{DynamicResource MainGridStyle}" />
+            </TabItem>
+        </TabControl>
+
+    </Grid>
+</Window>
