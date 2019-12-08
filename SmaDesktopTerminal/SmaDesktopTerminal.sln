@@ -5,6 +5,10 @@ VisualStudioVersion = 16.0.29411.108
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmaDesktopTerminal", "SmaDesktopTerminal\SmaDesktopTerminal.csproj", "{87765E6E-086C-4CD0-B79C-C2EEDEE0E4DE}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExchCommonLib", "..\..\ExchangeAnalyticsSvcSharp\ExchangeAnalyticsService\ExchCommonLib\ExchCommonLib.csproj", "{719EB4B6-C8CF-44B9-8C78-41CFBC148A58}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "base", "base", "{4FAB31CB-94DD-461C-86A6-CA7B16AEA29E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,9 +19,16 @@ Global
 		{87765E6E-086C-4CD0-B79C-C2EEDEE0E4DE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{87765E6E-086C-4CD0-B79C-C2EEDEE0E4DE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{87765E6E-086C-4CD0-B79C-C2EEDEE0E4DE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{719EB4B6-C8CF-44B9-8C78-41CFBC148A58}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{719EB4B6-C8CF-44B9-8C78-41CFBC148A58}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{719EB4B6-C8CF-44B9-8C78-41CFBC148A58}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{719EB4B6-C8CF-44B9-8C78-41CFBC148A58}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{719EB4B6-C8CF-44B9-8C78-41CFBC148A58} = {4FAB31CB-94DD-461C-86A6-CA7B16AEA29E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {EFF8C2C5-D07C-4333-B468-F22A49E42AAA}

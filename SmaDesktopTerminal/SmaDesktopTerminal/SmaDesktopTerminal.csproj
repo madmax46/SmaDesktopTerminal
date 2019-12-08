@@ -55,8 +55,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Classes\Instrument.cs" />
     <Compile Include="Classes\Person.cs" />
+    <Compile Include="Classes\ServiceResponses\InstrumentsResponse.cs" />
     <Compile Include="Models\TerminalWindowModel.cs" />
     <Compile Include="Windows\LogInWindow.xaml.cs">
       <DependentUpon>LogInWindow.xaml</DependentUpon>
@@ -116,6 +116,17 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Resource>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\ExchangeAnalyticsSvcSharp\ExchangeAnalyticsService\ExchCommonLib\ExchCommonLib.csproj">
+      <Project>{719EB4B6-C8CF-44B9-8C78-41CFBC148A58}</Project>
+      <Name>ExchCommonLib</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json">
+      <Version>12.0.3</Version>
+    </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

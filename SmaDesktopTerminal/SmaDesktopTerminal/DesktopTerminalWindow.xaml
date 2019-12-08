@@ -58,6 +58,7 @@
 
                         </ListView.ItemsPanel>-->
                     </ListView>
+                    <Button Grid.Column="1" Height="100" Width="100" Click="Button_Click" >asdasd</Button>
                 </Grid>
             </TabItem>
             <TabItem Header="TabItem">
