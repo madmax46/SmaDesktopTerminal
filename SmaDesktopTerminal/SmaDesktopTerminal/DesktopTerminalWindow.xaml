@@ -4,9 +4,15 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SmaDesktopTerminal"
+        xmlns:windows="clr-namespace:SmaDesktopTerminal.Windows"
         xmlns:tm="clr-namespace:SmaDesktopTerminal.Models"
+        xmlns:oxy="http://oxyplot.org/wpf"
+        xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
+
+
         mc:Ignorable="d"
-        Title="Sma Desktop Terminal" Height="450" Width="800" Style="{DynamicResource WindowStyle}">
+        Title="Sma Desktop Terminal" Height="450" Width="800" Style="{DynamicResource WindowStyle}"
+        Loaded="Window_Loaded">
 
     <Grid x:Name="terminalMainGrid" Style="{DynamicResource MainGridStyle}" >
         <Grid.RowDefinitions>
@@ -18,28 +24,55 @@
             <TextBlock x:Name="UserName" Height="20" VerticalAlignment="Center" Margin="20,0,387,0" Text="{Binding CurPerson.FullName}"  Style="{DynamicResource MaiTextBlockStyle}" ></TextBlock>
         </Grid>
         <TabControl x:Name="workWindowsTabControl" Grid.Row="1" Style="{DynamicResource MainTabControlStyle}" >
-            <TabItem Header="TabItem"  >
+            <TabItem Header="Обзор"  >
                 <Grid Style="{DynamicResource MainGridStyle }" >
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="200"></ColumnDefinition>
+                        <ColumnDefinition MinWidth="200" Width="200" MaxWidth="500" x:Name="firstColumn"></ColumnDefinition>
                         <ColumnDefinition/>
+                        <ColumnDefinition Width="200"/>
                     </Grid.ColumnDefinitions>
                     <Grid.RowDefinitions>
                     </Grid.RowDefinitions>
-                    <ListView Grid.Row="0" Grid.Column="0" ItemsSource="{Binding Instruments}">
-                        <ListView.View>
-                            <GridView>
-                                <!--<TextBlock Name="instrumentName">Название инструмента</TextBlock>-->
-                                <GridViewColumn  Header="Название инструмента"  >
-                                    <GridViewColumn.CellTemplate>
-                                        <DataTemplate>
-                                            <Grid>
-                                                <TextBlock Text="{Binding Name}" />
-                                            </Grid>
-                                        </DataTemplate>
-                                    </GridViewColumn.CellTemplate>
-                                </GridViewColumn>
-                                <GridViewColumn Header="bool"  >
+                    <GridSplitter  Height="Auto" Width="2" VerticalAlignment="Stretch" HorizontalAlignment="Right" Background="Transparent" />
+                    <GridSplitter Grid.Column="1" Height="Auto" Width="2" VerticalAlignment="Stretch" HorizontalAlignment="Right" Background="Transparent" />
+
+                    <UserControl Name="userControl" Grid.Row="0" Grid.Column="0" BorderBrush="Black" BorderThickness="1" Margin="0,0,2,0">
+                        <Grid>
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="30"></RowDefinition>
+                                    <RowDefinition/>
+                                </Grid.RowDefinitions>
+                                <Grid Grid.Row="0"  >
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="110"></ColumnDefinition>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition Width="35"/>
+                                        <ColumnDefinition Width="35" ></ColumnDefinition>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Margin="10,0,0,0" Grid.Column="0"  Style="{DynamicResource MaiTextBlockStyle}" HorizontalAlignment="Left" Width="100" >Инструменты</TextBlock>
+                                    <windows:CircularProgressBar x:Name="instrumentsProgressBar" Grid.Column="2"  HorizontalAlignment="Right" Visibility="Hidden" Height="Auto"/>
+                                    <Button Name="instrumentsUpdateBtn" Grid.Column="3" Click="instrumentsUpdateBtn_Click"  Margin="2,2">Up</Button>
+                                </Grid>
+                                <ListView Name="parsedInstrView" Grid.Row="1" ItemsSource="{Binding Instruments}" Width="auto" SelectionMode="Single" SelectedItem="{Binding SelectedInstrument , Mode=TwoWay}" SelectionChanged="parsedInstrView_SelectionChanged" >
+                                    <ListView.View >
+                                        <GridView >
+                                            <GridViewColumn >
+                                                <GridViewColumnHeader HorizontalContentAlignment="Left" >
+                                                    <TextBlock HorizontalAlignment="Left"  Width="auto" >Название</TextBlock>
+                                                </GridViewColumnHeader>
+                                                <GridViewColumn.CellTemplate>
+                                                    <DataTemplate>
+                                                        <Grid >
+                                                            <Grid.ColumnDefinitions>
+                                                                <ColumnDefinition Width="*" ></ColumnDefinition>
+                                                            </Grid.ColumnDefinitions>
+                                                            <TextBlock Grid.Column="0" Text="{Binding Name}" />
+                                                        </Grid>
+                                                    </DataTemplate>
+                                                </GridViewColumn.CellTemplate>
+                                            </GridViewColumn>
+                                            <!--<GridViewColumn Header="bool"  >
                                     <GridViewColumn.CellTemplate>
                                         <DataTemplate>
                                             <Grid>
@@ -47,24 +80,103 @@
                                             </Grid>
                                         </DataTemplate>
                                     </GridViewColumn.CellTemplate>
-                                </GridViewColumn>
-
-                                <!--<GridViewColumn Header="Column 2" Width="200"/>
+                                </GridViewColumn>-->
+                                            <!--<GridViewColumn Header="Column 2" Width="200"/>
                                 <GridViewColumn Header="Column 3" Width="200"/>-->
-                            </GridView>
-                        </ListView.View>
-                        <!--<ListView.ItemsPanel>
+                                        </GridView>
+                                    </ListView.View>
+                                    <!--<ListView.ItemsPanel>
                             
 
                         </ListView.ItemsPanel>-->
-                    </ListView>
-                    <Button Grid.Column="1" Height="100" Width="100" Click="Button_Click" >asdasd</Button>
+                                </ListView>
+                                <!--<Thumb x:Name="resizeThumb" Grid.Row="1" Height="10" Width="10" VerticalAlignment="Bottom" HorizontalAlignment="Right" DragDelta="resizeThumb_DragDelta" />-->
+
+                            </Grid>
+                        </Grid>
+                    </UserControl>
+
+                    <UserControl Name="chartUserControl" Grid.Row="0" Grid.Column="1" BorderBrush="Black" BorderThickness="1" Margin="2,0,2,0">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="30"></RowDefinition>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+                            <Grid Grid.Row="0"  >
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="80"></ColumnDefinition>
+                                    <ColumnDefinition Width="60"/>
+                                    <ColumnDefinition Width="50"/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition Width="35"/>
+                                    <ColumnDefinition Width="35" ></ColumnDefinition>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Margin="10,0,0,0" Grid.Column="0" Style="{DynamicResource MaiTextBlockStyle}" HorizontalAlignment="Left" Width="60" >График</TextBlock>
+                                <ComboBox Name="chartIntervalComboBox" ItemsSource="{Binding ChartIntervals}" SelectedItem="{Binding SelectedChartInterval}" SelectedIndex="0" Grid.Column="1">
+                                </ComboBox>
+                                <windows:CircularProgressBar x:Name="chartProgressBar" Grid.Column="4"  HorizontalAlignment="Right" Visibility="Hidden" Height="Auto"/>
+                                <Button Name="chartUpdateBtn" Grid.Column="5" Click="chartUpdateBtn_Click" Margin="2,2">Up</Button>
+                            </Grid>
+                            <Grid Grid.Row="1">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition></RowDefinition>
+                                    <RowDefinition Height="100"></RowDefinition>
+                                </Grid.RowDefinitions>
+                                <!--<oxy:PlotView x:Name="oxyPlotView" Model="{Binding CandlesChart}" >
+                                </oxy:PlotView>-->
+                                <lvc:CartesianChart Name="liveChartOhlc" Grid.Row="0" ScrollMode="X" Zoom="X" Series="{Binding SeriesCollection}" Margin="10,10" >
+                                    <lvc:CartesianChart.AxisX>
+                                        <lvc:Axis Labels="{Binding Labels}" Separator="{x:Static lvc:DefaultAxes.CleanSeparator}"  Title="Time" RangeChanged="Axis_RangeChanged" HorizontalAlignment="Left"  MinRange="30" MaxRange="50"/>
+                                    </lvc:CartesianChart.AxisX>
+                                </lvc:CartesianChart>
+                                <lvc:CartesianChart Name="liveChartVolume" Grid.Row="1" Series="{Binding SeriesVolumeCollection}" Margin="10,10" >
+                                    <lvc:CartesianChart.AxisX>
+                                        <lvc:Axis Labels="{Binding Labels}" MinRange="30" MaxRange="50"/>
+                                    </lvc:CartesianChart.AxisX>
+                                </lvc:CartesianChart>
+                            </Grid>
+                        </Grid>
+
+                    </UserControl>
                 </Grid>
             </TabItem>
-            <TabItem Header="TabItem">
+            <!--<TabItem Header="Интерактивный график">
                 <Grid Style="{DynamicResource MainGridStyle}" />
+            </TabItem>-->
+            <TabItem Header="Технический анализ">
+                <Grid Style="{DynamicResource MainGridStyle}" >
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="50"></RowDefinition>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+
+                    <Grid Grid.Row="1">
+                        <Grid.RowDefinitions>
+                            <RowDefinition></RowDefinition>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+                        <Grid Grid.Row="0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition></ColumnDefinition>
+                                <ColumnDefinition></ColumnDefinition>
+                                <ColumnDefinition></ColumnDefinition>
+                            </Grid.ColumnDefinitions>
+                        </Grid>
+                        <Grid Grid.Row="1">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition></ColumnDefinition>
+                                <ColumnDefinition></ColumnDefinition>
+                                <ColumnDefinition></ColumnDefinition>
+                            </Grid.ColumnDefinitions>
+
+                        </Grid>
+
+                    </Grid>
+                </Grid>
             </TabItem>
         </TabControl>
 
     </Grid>
+
+
 </Window>

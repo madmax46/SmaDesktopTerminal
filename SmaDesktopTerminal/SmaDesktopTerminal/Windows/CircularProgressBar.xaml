@@ -1,0 +1,41 @@
+﻿<UserControl x:Class="SmaDesktopTerminal.Windows.CircularProgressBar"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:SmaDesktopTerminal.Windows"
+            Height="30" Width="30" Background="Transparent">
+    <Grid x:Name="LayoutRoot" Background="Transparent"
+             HorizontalAlignment="Center" VerticalAlignment="Center">
+        <Grid.RenderTransform>
+            <ScaleTransform x:Name="SpinnerScale"
+                               ScaleX="1.0" ScaleY="1.0" />
+        </Grid.RenderTransform>
+        <Canvas RenderTransformOrigin="0.5,0.5"
+                  HorizontalAlignment="Center"
+                  VerticalAlignment="Center"
+                  Width="30" Height="30" >
+            <Ellipse Width="28" Height="28" StrokeThickness="4"  Canvas.Top="1" Canvas.Left="1" Stroke="Gray"  ></Ellipse>
+            <Ellipse Width="28" Height="28" StrokeThickness="4"  Canvas.Top="1" Canvas.Left="1" Stroke="Green"  >
+                <Ellipse.Clip>
+                    <RectangleGeometry Rect="0 14 14 30"  />
+                </Ellipse.Clip>
+            </Ellipse>
+            <Canvas.RenderTransform>
+                <RotateTransform x:Name="SpinnerRotate" Angle="0" />
+            </Canvas.RenderTransform>
+            <Canvas.Triggers>
+                <EventTrigger RoutedEvent="ContentControl.Loaded">
+                    <BeginStoryboard>
+                        <Storyboard>
+                            <DoubleAnimation
+                                  Storyboard.TargetName="SpinnerRotate"
+                                   Storyboard.TargetProperty="(RotateTransform.Angle)"
+                                   From="0" To="360"
+                                   Duration="0:0:01"
+                                   RepeatBehavior="Forever" />
+                        </Storyboard>
+                    </BeginStoryboard>
+                </EventTrigger>
+            </Canvas.Triggers>
+        </Canvas>
+    </Grid>
+</UserControl>
