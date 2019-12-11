@@ -11,7 +11,7 @@
 
 
         mc:Ignorable="d"
-        Title="Sma Desktop Terminal" Height="450" Width="800" Style="{DynamicResource WindowStyle}"
+        Title="Sma Desktop Terminal" Height="600" Width="1024" Style="{DynamicResource WindowStyle}"
         Loaded="Window_Loaded">
 
     <Grid x:Name="terminalMainGrid" Style="{DynamicResource MainGridStyle}" >
@@ -59,7 +59,7 @@
                                         <GridView >
                                             <GridViewColumn >
                                                 <GridViewColumnHeader HorizontalContentAlignment="Left" >
-                                                    <TextBlock HorizontalAlignment="Left"  Width="auto" >Название</TextBlock>
+                                                    <TextBlock HorizontalAlignment="Left" Width="auto" >Название</TextBlock>
                                                 </GridViewColumnHeader>
                                                 <GridViewColumn.CellTemplate>
                                                     <DataTemplate>
@@ -147,9 +147,35 @@
                 <Grid Style="{DynamicResource MainGridStyle}" >
                     <Grid.RowDefinitions>
                         <RowDefinition Height="50"></RowDefinition>
-                        <RowDefinition/>
+                        <RowDefinition Height="450"/>
                     </Grid.RowDefinitions>
+                    <Grid Grid.Row="0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition  Width="120" MaxWidth="220"></ColumnDefinition>
+                            <ColumnDefinition Width="70"></ColumnDefinition>
+                            <ColumnDefinition Width="70"></ColumnDefinition>
+                            <ColumnDefinition Width="70"></ColumnDefinition>
+                            <ColumnDefinition Width="70"></ColumnDefinition>
+                            <ColumnDefinition Width="70"></ColumnDefinition>
+                            <ColumnDefinition Width="70"></ColumnDefinition>
+                            <ColumnDefinition Width="70"></ColumnDefinition>
+                            <ColumnDefinition Width="70"></ColumnDefinition>
+                            <ColumnDefinition Width="70"></ColumnDefinition>
+                            <ColumnDefinition Width="1*"></ColumnDefinition>
 
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock Grid.Column="0" Margin="10" Width="100" MaxWidth="200" HorizontalAlignment="Left"  Text="{Binding ElementName=parsedInstrView, Path=SelectedItem.Name, Mode=OneWay}" TextWrapping="Wrap" ></TextBlock>
+
+                        <RadioButton Grid.Column="1" Height="30" Width="60" VerticalAlignment="Center" Style="{StaticResource {x:Type ToggleButton}}">1min</RadioButton>
+                        <RadioButton Grid.Column="2" Height="30" Width="60" VerticalAlignment="Center" Style="{StaticResource {x:Type ToggleButton}}">5min</RadioButton>
+                        <RadioButton Grid.Column="3" Height="30" Width="60" VerticalAlignment="Center" Style="{StaticResource {x:Type ToggleButton}}">15min</RadioButton>
+                        <RadioButton Grid.Column="4" Height="30" Width="60" VerticalAlignment="Center" Style="{StaticResource {x:Type ToggleButton}}">hour</RadioButton>
+                        <RadioButton Grid.Column="5" Height="30" Width="60" VerticalAlignment="Center" Style="{StaticResource {x:Type ToggleButton}}">4hour</RadioButton>
+                        <RadioButton Grid.Column="6" Height="30" Width="60" VerticalAlignment="Center" Style="{StaticResource {x:Type ToggleButton}}">day</RadioButton>
+                        <RadioButton Grid.Column="7" Height="30" Width="60" VerticalAlignment="Center" Style="{StaticResource {x:Type ToggleButton}}">week</RadioButton>
+                        <RadioButton Grid.Column="8" Height="30" Width="60" VerticalAlignment="Center" Style="{StaticResource {x:Type ToggleButton}}">month</RadioButton>
+                    </Grid>
                     <Grid Grid.Row="1">
                         <Grid.RowDefinitions>
                             <RowDefinition></RowDefinition>
@@ -161,6 +187,76 @@
                                 <ColumnDefinition></ColumnDefinition>
                                 <ColumnDefinition></ColumnDefinition>
                             </Grid.ColumnDefinitions>
+                            <UserControl Name="aiTechnicalAnalysis" Grid.Column="0">
+                                <GroupBox Margin="10" Header="Сводный анализ">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="37*"></ColumnDefinition>
+                                            <ColumnDefinition Width="24*"></ColumnDefinition>
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition></RowDefinition>
+                                            <RowDefinition></RowDefinition>
+                                            <RowDefinition></RowDefinition>
+                                            <RowDefinition></RowDefinition>
+                                            <RowDefinition></RowDefinition>
+                                            <RowDefinition></RowDefinition>
+                                        </Grid.RowDefinitions>
+                                        <TextBlock Grid.Column="0" Grid.Row="0" Margin="5,5,0,5" HorizontalAlignment="Left" Width="114" >Сводный анализ</TextBlock>
+                                        <TextBlock Grid.Column="1" Grid.Row="0" Margin="0,5,5,5" HorizontalAlignment="Right" Width="12" >--</TextBlock>
+                                        <TextBlock Grid.Column="0" Grid.Row="1" Margin="5,5,0,5" HorizontalAlignment="Left" Width="147" >Анализ на основе ML</TextBlock>
+                                        <TextBlock Grid.Column="1" Grid.Row="1" Margin="0,5,5,5" HorizontalAlignment="Right" Width="12" >--</TextBlock>
+                                    </Grid>
+                                </GroupBox>
+                            </UserControl>
+                            <UserControl Name="indicatorsTechnicalAnalysis" Grid.Column="1">
+                                <GroupBox Margin="10" Header="Осцилляторы">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition></ColumnDefinition>
+                                            <ColumnDefinition></ColumnDefinition>
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition></RowDefinition>
+                                            <RowDefinition></RowDefinition>
+                                            <RowDefinition></RowDefinition>
+                                            <RowDefinition></RowDefinition>
+                                        </Grid.RowDefinitions>
+                                        <TextBlock Grid.Column="0" Grid.Row="0" Margin="5" HorizontalAlignment="Left" >Сводный анализ</TextBlock>
+                                        <TextBlock Grid.Column="1" Grid.Row="0" Margin="5" HorizontalAlignment="Right" Text="{Binding Summary}" >--</TextBlock>
+                                        <TextBlock Grid.Column="0" Grid.Row="1" Margin="5" HorizontalAlignment="Left" >Продавать</TextBlock>
+                                        <TextBlock Grid.Column="1" Grid.Row="1" Margin="5" HorizontalAlignment="Right" Text="{Binding StronSell}">--</TextBlock>
+                                        <TextBlock Grid.Column="0" Grid.Row="2" Margin="5" HorizontalAlignment="Left" >Нейтрально</TextBlock>
+                                        <TextBlock Grid.Column="1" Grid.Row="2" Margin="5" HorizontalAlignment="Right" Text="{Binding Neutral}">--</TextBlock>
+                                        <TextBlock Grid.Column="0" Grid.Row="3" Margin="5" HorizontalAlignment="Left" >Покупать</TextBlock>
+                                        <TextBlock Grid.Column="1" Grid.Row="3" Margin="5" HorizontalAlignment="Right" Text="{Binding Buy}">--</TextBlock>
+                                    </Grid>
+                                </GroupBox>
+                            </UserControl>
+                            <UserControl Name="maTechnicalAnalysis" Grid.Column="2">
+                                <GroupBox Margin="10" Header="Скользящие средние">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition></ColumnDefinition>
+                                            <ColumnDefinition></ColumnDefinition>
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition></RowDefinition>
+                                            <RowDefinition></RowDefinition>
+                                            <RowDefinition></RowDefinition>
+                                            <RowDefinition></RowDefinition>
+                                        </Grid.RowDefinitions>
+                                        <TextBlock Grid.Column="0" Grid.Row="0" Margin="5" HorizontalAlignment="Left" >Сводный анализ</TextBlock>
+                                        <TextBlock Grid.Column="1" Grid.Row="0" Margin="5" HorizontalAlignment="Right" Text="{Binding Summary}" >--</TextBlock>
+                                        <TextBlock Grid.Column="0" Grid.Row="1" Margin="5" HorizontalAlignment="Left" >Продавать</TextBlock>
+                                        <TextBlock Grid.Column="1" Grid.Row="1" Margin="5" HorizontalAlignment="Right" Text="{Binding StronSell}">--</TextBlock>
+                                        <TextBlock Grid.Column="0" Grid.Row="2" Margin="5" HorizontalAlignment="Left" >Нейтрально</TextBlock>
+                                        <TextBlock Grid.Column="1" Grid.Row="2" Margin="5" HorizontalAlignment="Right" Text="{Binding Neutral}">--</TextBlock>
+                                        <TextBlock Grid.Column="0" Grid.Row="3" Margin="5" HorizontalAlignment="Left" >Покупать</TextBlock>
+                                        <TextBlock Grid.Column="1" Grid.Row="3" Margin="5" HorizontalAlignment="Right" Text="{Binding Buy}">--</TextBlock>
+                                    </Grid>
+                                </GroupBox>
+                            </UserControl>
                         </Grid>
                         <Grid Grid.Row="1">
                             <Grid.ColumnDefinitions>
@@ -168,6 +264,34 @@
                                 <ColumnDefinition></ColumnDefinition>
                                 <ColumnDefinition></ColumnDefinition>
                             </Grid.ColumnDefinitions>
+                            <UserControl Name="aiTechnicalAnalysisDetails" Grid.Column="0">
+                                <GroupBox Margin="10" Header="Анализ на основе ML">
+                                    <Grid>
+                                        <ListView>
+
+                                        </ListView>
+                                    </Grid>
+                                </GroupBox>
+                            </UserControl>
+                            <UserControl Name="indicatorsTechnicalAnalysisDetails" Grid.Column="1">
+                                <GroupBox Margin="10" Header="Осцилляторы">
+                                    <Grid>
+                                        <ListView>
+
+                                        </ListView>
+                                    </Grid>
+                                </GroupBox>
+                            </UserControl>
+                            <UserControl Name="maTechnicalAnalysisDetails" Grid.Column="2">
+                                <GroupBox Margin="10" Header="Скользящие средние">
+                                    <Grid>
+                                        <ListView>
+
+                                        </ListView>
+                                    </Grid>
+                                </GroupBox>
+                            </UserControl>
+
 
                         </Grid>
 
