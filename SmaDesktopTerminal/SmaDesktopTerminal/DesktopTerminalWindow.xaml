@@ -170,8 +170,8 @@
                         <RadioButton Grid.Column="1" Height="30" Width="60" VerticalAlignment="Center" Style="{StaticResource {x:Type ToggleButton}}">1min</RadioButton>
                         <RadioButton Grid.Column="2" Height="30" Width="60" VerticalAlignment="Center" Style="{StaticResource {x:Type ToggleButton}}">5min</RadioButton>
                         <RadioButton Grid.Column="3" Height="30" Width="60" VerticalAlignment="Center" Style="{StaticResource {x:Type ToggleButton}}">15min</RadioButton>
-                        <RadioButton Grid.Column="4" Height="30" Width="60" VerticalAlignment="Center" Style="{StaticResource {x:Type ToggleButton}}">hour</RadioButton>
-                        <RadioButton Grid.Column="5" Height="30" Width="60" VerticalAlignment="Center" Style="{StaticResource {x:Type ToggleButton}}">4hour</RadioButton>
+                        <RadioButton Grid.Column="4" Height="30" Width="60" VerticalAlignment="Center" Style="{StaticResource {x:Type ToggleButton}}">30min</RadioButton>
+                        <RadioButton Grid.Column="5" Height="30" Width="60" VerticalAlignment="Center" Style="{StaticResource {x:Type ToggleButton}}">hour</RadioButton>
                         <RadioButton Grid.Column="6" Height="30" Width="60" VerticalAlignment="Center" Style="{StaticResource {x:Type ToggleButton}}">day</RadioButton>
                         <RadioButton Grid.Column="7" Height="30" Width="60" VerticalAlignment="Center" Style="{StaticResource {x:Type ToggleButton}}">week</RadioButton>
                         <RadioButton Grid.Column="8" Height="30" Width="60" VerticalAlignment="Center" Style="{StaticResource {x:Type ToggleButton}}">month</RadioButton>
