@@ -61,7 +61,7 @@ namespace SmaDesktopTerminal
 
         private void parsedInstrView_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            windowModel.ReloadCandlesAsync();
+            windowModel.InstrumentSelectionChanged();
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -82,7 +82,7 @@ namespace SmaDesktopTerminal
 
         private void chartUpdateBtn_Click(object sender, RoutedEventArgs e)
         {
-            windowModel.ReloadCandlesAsync();
+            windowModel.InstrumentSelectionChanged();
         }
 
         private void Axis_RangeChanged(LiveCharts.Events.RangeChangedEventArgs eventArgs)
@@ -90,14 +90,17 @@ namespace SmaDesktopTerminal
             //liveChartOhlc.AxisX[0].SetRange(30, 30);
             //eventArgs.Range
             //sync the graphs
-            double max = ((Axis)eventArgs.Axis).MaxValue;
-            double min = max - 30;
 
-            this.liveChartOhlc.AxisX[0].MinValue = min;
-            this.liveChartOhlc.AxisX[0].MaxValue = max;
 
-            this.liveChartVolume.AxisX[0].MinValue = min;
-            this.liveChartVolume.AxisX[0].MaxValue = max;
+
+            //double max = ((Axis)eventArgs.Axis).MaxValue;
+            //double min = max - 30;
+
+            //this.liveChartOhlc.AxisX[0].MinValue = min;
+            //this.liveChartOhlc.AxisX[0].MaxValue = max;
+
+            //this.liveChartVolume.AxisX[0].MinValue = min;
+            //this.liveChartVolume.AxisX[0].MaxValue = max;
 
             //Repeat for as many graphs as you have
         }

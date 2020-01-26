@@ -1,0 +1,72 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using ExchCommonLib.Classes;
+
+namespace SmaDesktopTerminal.Classes.Analytics
+{
+    public class ConsolidateInstrumentsAnalysis
+    {
+
+        public string Summary { get; private set; }
+        public uint SellCnt { get; }
+        public uint BuyCnt { get; }
+        public uint NeutralCnt { get; }
+
+
+        public static Dictionary<int, string> DecisionStr = new Dictionary<int, string>()
+        {
+            {1, "Активно продавать"},
+            {2, "Продавать"},
+            {3, "Держать"},
+            {4, "Покупать"},
+            {5, "Активно покупать"},
+        };
+
+        public ConsolidateInstrumentsAnalysis(List<AnalyticalPredictionInfo> predictions)
+        {
+            var sellCnt = predictions.Count(r => r.PredictionDecision == "Продавать");
+            var buyCnt = predictions.Count(r => r.PredictionDecision == "Покупать");
+            var neutralCnt = predictions.Count(r => r.PredictionDecision == "Держать");
+
+            SellCnt = (uint)sellCnt;
+            BuyCnt = (uint)buyCnt;
+            NeutralCnt = (uint)neutralCnt;
+
+            Summary = GetConsolidateDecision(SellCnt, BuyCnt, NeutralCnt);
+        }
+        public ConsolidateInstrumentsAnalysis(uint sellCnt, uint buyCnt, uint neutralCnt)
+        {
+            SellCnt = sellCnt;
+            BuyCnt = buyCnt;
+            NeutralCnt = neutralCnt;
+
+            Summary = GetConsolidateDecision(SellCnt, BuyCnt, NeutralCnt);
+        }
+
+        public static string GetConsolidateDecision(uint sellCnt, uint buyCnt, uint neutralCnt)
+        {
+            var allClassesCnt = buyCnt + sellCnt + neutralCnt;
+            var classSum = (int)buyCnt - sellCnt;
+
+            var intervalClass = 2 * allClassesCnt / 5;
+
+            var leftInterval = -1 * allClassesCnt;
+            var rightInterval = leftInterval + intervalClass;
+            for (var i = 1; i <= 5; i++)
+            {
+                if (classSum >= leftInterval && classSum <= rightInterval)
+                    return DecisionStr[i];
+
+                leftInterval += intervalClass;
+                rightInterval += intervalClass;
+            }
+
+            return DecisionStr[3];
+        }
+
+
+    }
+}

@@ -9,7 +9,6 @@
         xmlns:oxy="http://oxyplot.org/wpf"
         xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
 
-
         mc:Ignorable="d"
         Title="Sma Desktop Terminal" Height="600" Width="1024" Style="{DynamicResource WindowStyle}"
         Loaded="Window_Loaded">
@@ -51,8 +50,13 @@
                                         <ColumnDefinition Width="35" ></ColumnDefinition>
                                     </Grid.ColumnDefinitions>
                                     <TextBlock Margin="10,0,0,0" Grid.Column="0"  Style="{DynamicResource MaiTextBlockStyle}" HorizontalAlignment="Left" Width="100" >Инструменты</TextBlock>
+                                    <Button Name="instrumentsUpdateBtn" Grid.Column="3" Click="instrumentsUpdateBtn_Click" Margin="3" Style="{DynamicResource ButtonUpdateStyle}" >
+                                        <!--<Button.Background >
+                                            <ImageBrush ImageSource="Resources/button_refresh_15001.ico"  />
+                                        </Button.Background>-->
+
+                                    </Button>
                                     <windows:CircularProgressBar x:Name="instrumentsProgressBar" Grid.Column="2"  HorizontalAlignment="Right" Visibility="Hidden" Height="Auto"/>
-                                    <Button Name="instrumentsUpdateBtn" Grid.Column="3" Click="instrumentsUpdateBtn_Click"  Margin="2,2">Up</Button>
                                 </Grid>
                                 <ListView Name="parsedInstrView" Grid.Row="1" ItemsSource="{Binding Instruments}" Width="auto" SelectionMode="Single" SelectedItem="{Binding SelectedInstrument , Mode=TwoWay}" SelectionChanged="parsedInstrView_SelectionChanged" >
                                     <ListView.View >
@@ -115,7 +119,7 @@
                                 <ComboBox Name="chartIntervalComboBox" ItemsSource="{Binding ChartIntervals}" SelectedItem="{Binding SelectedChartInterval}" SelectedIndex="0" Grid.Column="1">
                                 </ComboBox>
                                 <windows:CircularProgressBar x:Name="chartProgressBar" Grid.Column="4"  HorizontalAlignment="Right" Visibility="Hidden" Height="Auto"/>
-                                <Button Name="chartUpdateBtn" Grid.Column="5" Click="chartUpdateBtn_Click" Margin="2,2">Up</Button>
+                                <Button Name="chartUpdateBtn" Grid.Column="5" Click="chartUpdateBtn_Click" Margin="3" Style="{DynamicResource ButtonUpdateStyle}"></Button>
                             </Grid>
                             <Grid Grid.Row="1">
                                 <Grid.RowDefinitions>
@@ -126,18 +130,19 @@
                                 </oxy:PlotView>-->
                                 <lvc:CartesianChart Name="liveChartOhlc" Grid.Row="0" ScrollMode="X" Zoom="X" Series="{Binding SeriesCollection}" Margin="10,10" >
                                     <lvc:CartesianChart.AxisX>
-                                        <lvc:Axis Labels="{Binding Labels}" Separator="{x:Static lvc:DefaultAxes.CleanSeparator}"  Title="Time" RangeChanged="Axis_RangeChanged" HorizontalAlignment="Left"  MinRange="30" MaxRange="50"/>
+                                        <lvc:Axis Labels="{Binding Labels}" Separator="{x:Static lvc:DefaultAxes.CleanSeparator}"  Title="Time" MinValue="{Binding MinAxesVal}" MaxValue="{Binding MaxAxesVal}"  RangeChanged="Axis_RangeChanged" HorizontalAlignment="Left"/>
                                     </lvc:CartesianChart.AxisX>
                                 </lvc:CartesianChart>
                                 <lvc:CartesianChart Name="liveChartVolume" Grid.Row="1" Series="{Binding SeriesVolumeCollection}" Margin="10,10" >
                                     <lvc:CartesianChart.AxisX>
-                                        <lvc:Axis Labels="{Binding Labels}" MinRange="30" MaxRange="50"/>
+                                        <lvc:Axis Labels="{Binding Labels}" MinValue="{Binding MinAxesVal}" MaxValue="{Binding MaxAxesVal}"/>
                                     </lvc:CartesianChart.AxisX>
                                 </lvc:CartesianChart>
                             </Grid>
                         </Grid>
 
                     </UserControl>
+
                 </Grid>
             </TabItem>
             <!--<TabItem Header="Интерактивный график">
@@ -147,7 +152,7 @@
                 <Grid Style="{DynamicResource MainGridStyle}" >
                     <Grid.RowDefinitions>
                         <RowDefinition Height="50"></RowDefinition>
-                        <RowDefinition Height="450"/>
+                        <RowDefinition/>
                     </Grid.RowDefinitions>
                     <Grid Grid.Row="0">
                         <Grid.ColumnDefinitions>
@@ -178,8 +183,8 @@
                     </Grid>
                     <Grid Grid.Row="1">
                         <Grid.RowDefinitions>
-                            <RowDefinition></RowDefinition>
-                            <RowDefinition/>
+                            <RowDefinition Height="225"></RowDefinition>
+                            <RowDefinition />
                         </Grid.RowDefinitions>
                         <Grid Grid.Row="0">
                             <Grid.ColumnDefinitions>
@@ -188,7 +193,7 @@
                                 <ColumnDefinition></ColumnDefinition>
                             </Grid.ColumnDefinitions>
                             <UserControl Name="aiTechnicalAnalysis" Grid.Column="0">
-                                <GroupBox Margin="10" Header="Сводный анализ">
+                                <GroupBox Margin="10" Header="Сводный анализ" DataContext="{Binding MlAnalysisInfo.ConsolidateAnalysisInfo}" >
                                     <Grid>
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="37*"></ColumnDefinition>
@@ -203,15 +208,15 @@
                                             <RowDefinition></RowDefinition>
                                         </Grid.RowDefinitions>
                                         <TextBlock Grid.Column="0" Grid.Row="0" Margin="5,5,0,5" HorizontalAlignment="Left" Width="114" >Сводный анализ</TextBlock>
-                                        <TextBlock Grid.Column="1" Grid.Row="0" Margin="0,5,5,5" HorizontalAlignment="Right" Width="12" >--</TextBlock>
+                                        <TextBlock Grid.Column="1" Grid.Row="0" Margin="0,5,5,5" HorizontalAlignment="Right" Width="12" ></TextBlock>
                                         <TextBlock Grid.Column="0" Grid.Row="1" Margin="5,5,0,5" HorizontalAlignment="Left" Width="147" >Анализ на основе ML</TextBlock>
-                                        <TextBlock Grid.Column="1" Grid.Row="1" Margin="0,5,5,5" HorizontalAlignment="Right" Width="12" >--</TextBlock>
+                                        <TextBlock Grid.Column="1" Grid.Row="1" Margin="0,5,5,5" HorizontalAlignment="Right" Width="12" ></TextBlock>
                                     </Grid>
                                 </GroupBox>
                             </UserControl>
                             <UserControl Name="indicatorsTechnicalAnalysis" Grid.Column="1">
-                                <GroupBox Margin="10" Header="Осцилляторы">
-                                    <Grid>
+                                <GroupBox Margin="10" Header="Осцилляторы" DataContext="{Binding OscillatorsInfo}">
+                                    <Grid DataContext="{Binding ConsolidateAnalysisInfo}">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition></ColumnDefinition>
                                             <ColumnDefinition></ColumnDefinition>
@@ -223,18 +228,18 @@
                                             <RowDefinition></RowDefinition>
                                         </Grid.RowDefinitions>
                                         <TextBlock Grid.Column="0" Grid.Row="0" Margin="5" HorizontalAlignment="Left" >Сводный анализ</TextBlock>
-                                        <TextBlock Grid.Column="1" Grid.Row="0" Margin="5" HorizontalAlignment="Right" Text="{Binding Summary}" >--</TextBlock>
+                                        <TextBlock Grid.Column="1" Grid.Row="0" Margin="5" HorizontalAlignment="Right" Text="{Binding Summary}" ></TextBlock>
                                         <TextBlock Grid.Column="0" Grid.Row="1" Margin="5" HorizontalAlignment="Left" >Продавать</TextBlock>
-                                        <TextBlock Grid.Column="1" Grid.Row="1" Margin="5" HorizontalAlignment="Right" Text="{Binding StronSell}">--</TextBlock>
+                                        <TextBlock Grid.Column="1" Grid.Row="1" Margin="5" HorizontalAlignment="Right" Text="{Binding SellCnt}"></TextBlock>
                                         <TextBlock Grid.Column="0" Grid.Row="2" Margin="5" HorizontalAlignment="Left" >Нейтрально</TextBlock>
-                                        <TextBlock Grid.Column="1" Grid.Row="2" Margin="5" HorizontalAlignment="Right" Text="{Binding Neutral}">--</TextBlock>
+                                        <TextBlock Grid.Column="1" Grid.Row="2" Margin="5" HorizontalAlignment="Right" Text="{Binding NeutralCnt}"></TextBlock>
                                         <TextBlock Grid.Column="0" Grid.Row="3" Margin="5" HorizontalAlignment="Left" >Покупать</TextBlock>
-                                        <TextBlock Grid.Column="1" Grid.Row="3" Margin="5" HorizontalAlignment="Right" Text="{Binding Buy}">--</TextBlock>
+                                        <TextBlock Grid.Column="1" Grid.Row="3" Margin="5" HorizontalAlignment="Right" Text="{Binding BuyCnt}"></TextBlock>
                                     </Grid>
                                 </GroupBox>
                             </UserControl>
-                            <UserControl Name="maTechnicalAnalysis" Grid.Column="2">
-                                <GroupBox Margin="10" Header="Скользящие средние">
+                            <UserControl Name="maTechnicalAnalysis" Grid.Column="2" >
+                                <GroupBox Margin="10" Header="Скользящие средние" DataContext="{Binding MovingAveragesInfo.ConsolidateAnalysisInfo}">
                                     <Grid>
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition></ColumnDefinition>
@@ -247,45 +252,199 @@
                                             <RowDefinition></RowDefinition>
                                         </Grid.RowDefinitions>
                                         <TextBlock Grid.Column="0" Grid.Row="0" Margin="5" HorizontalAlignment="Left" >Сводный анализ</TextBlock>
-                                        <TextBlock Grid.Column="1" Grid.Row="0" Margin="5" HorizontalAlignment="Right" Text="{Binding Summary}" >--</TextBlock>
+                                        <TextBlock Grid.Column="1" Grid.Row="0" Margin="5" HorizontalAlignment="Right" Text="{Binding Summary}" ></TextBlock>
                                         <TextBlock Grid.Column="0" Grid.Row="1" Margin="5" HorizontalAlignment="Left" >Продавать</TextBlock>
-                                        <TextBlock Grid.Column="1" Grid.Row="1" Margin="5" HorizontalAlignment="Right" Text="{Binding StronSell}">--</TextBlock>
+                                        <TextBlock Grid.Column="1" Grid.Row="1" Margin="5" HorizontalAlignment="Right" Text="{Binding SellCnt}"></TextBlock>
                                         <TextBlock Grid.Column="0" Grid.Row="2" Margin="5" HorizontalAlignment="Left" >Нейтрально</TextBlock>
-                                        <TextBlock Grid.Column="1" Grid.Row="2" Margin="5" HorizontalAlignment="Right" Text="{Binding Neutral}">--</TextBlock>
+                                        <TextBlock Grid.Column="1" Grid.Row="2" Margin="5" HorizontalAlignment="Right" Text="{Binding NeutralCnt}"></TextBlock>
                                         <TextBlock Grid.Column="0" Grid.Row="3" Margin="5" HorizontalAlignment="Left" >Покупать</TextBlock>
-                                        <TextBlock Grid.Column="1" Grid.Row="3" Margin="5" HorizontalAlignment="Right" Text="{Binding Buy}">--</TextBlock>
+                                        <TextBlock Grid.Column="1" Grid.Row="3" Margin="5" HorizontalAlignment="Right" Text="{Binding BuyCnt}"></TextBlock>
                                     </Grid>
                                 </GroupBox>
                             </UserControl>
                         </Grid>
-                        <Grid Grid.Row="1">
+                        <Grid Grid.Row="1" MinHeight="225" >
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition></ColumnDefinition>
+                                <ColumnDefinition ></ColumnDefinition>
                                 <ColumnDefinition></ColumnDefinition>
                                 <ColumnDefinition></ColumnDefinition>
                             </Grid.ColumnDefinitions>
-                            <UserControl Name="aiTechnicalAnalysisDetails" Grid.Column="0">
-                                <GroupBox Margin="10" Header="Анализ на основе ML">
+                            <UserControl Name="aiTechnicalAnalysisDetails" Grid.Column="0" >
+                                <GroupBox Margin="10" Header="Анализ на основе ML" DataContext="{Binding MlAnalysisInfo}" >
                                     <Grid>
-                                        <ListView>
+                                        <ListView ItemsSource="{Binding Predictions}">
+                                            <ListView.View >
+                                                <GridView >
+                                                    <GridViewColumn >
+                                                        <GridViewColumnHeader HorizontalContentAlignment="Left" >
+                                                            <TextBlock HorizontalAlignment="Left" MaxWidth="200" Width="auto" TextWrapping="Wrap" >Название</TextBlock>
+                                                        </GridViewColumnHeader>
+                                                        <GridViewColumn.CellTemplate>
+                                                            <DataTemplate>
+                                                                <Grid >
+                                                                    <Grid.ColumnDefinitions>
+                                                                        <ColumnDefinition  Width="200" MaxWidth="500" ></ColumnDefinition>
+                                                                    </Grid.ColumnDefinitions>
+                                                                    <TextBlock Grid.Column="0" Text="{Binding MethodName}" />
+                                                                </Grid>
+                                                            </DataTemplate>
+                                                        </GridViewColumn.CellTemplate>
+                                                    </GridViewColumn>
+                                                    <GridViewColumn >
+                                                        <GridViewColumnHeader HorizontalContentAlignment="Left" >
+                                                            <TextBlock HorizontalAlignment="Left" Width="auto" >Значение</TextBlock>
+                                                        </GridViewColumnHeader>
+                                                        <GridViewColumn.CellTemplate>
+                                                            <DataTemplate>
+                                                                <Grid >
+                                                                    <Grid.ColumnDefinitions>
+                                                                        <ColumnDefinition Width="*" ></ColumnDefinition>
+                                                                    </Grid.ColumnDefinitions>
+                                                                    <TextBlock Grid.Column="0" Text="{Binding Value}" />
+                                                                </Grid>
+                                                            </DataTemplate>
+                                                        </GridViewColumn.CellTemplate>
+                                                    </GridViewColumn>
+                                                    <GridViewColumn >
+                                                        <GridViewColumnHeader HorizontalContentAlignment="Left" >
+                                                            <TextBlock HorizontalAlignment="Left" Width="auto" >Действие</TextBlock>
+                                                        </GridViewColumnHeader>
+                                                        <GridViewColumn.CellTemplate>
+                                                            <DataTemplate>
+                                                                <Grid >
+                                                                    <Grid.ColumnDefinitions>
+                                                                        <ColumnDefinition Width="*" ></ColumnDefinition>
+                                                                    </Grid.ColumnDefinitions>
+                                                                    <TextBlock Grid.Column="0" Text="{Binding PredictionDecision}" />
+                                                                </Grid>
+                                                            </DataTemplate>
+                                                        </GridViewColumn.CellTemplate>
+                                                    </GridViewColumn>
+                                                </GridView>
+                                            </ListView.View>
 
                                         </ListView>
                                     </Grid>
                                 </GroupBox>
                             </UserControl>
                             <UserControl Name="indicatorsTechnicalAnalysisDetails" Grid.Column="1">
-                                <GroupBox Margin="10" Header="Осцилляторы">
+                                <GroupBox Margin="10" Header="Осцилляторы" DataContext="{Binding OscillatorsInfo}">
                                     <Grid>
-                                        <ListView>
+                                        <ListView ItemsSource="{Binding Predictions}">
+                                            <ListView.View >
+                                                <GridView >
+                                                    <GridViewColumn >
+                                                        <GridViewColumnHeader HorizontalContentAlignment="Left" >
+                                                            <TextBlock HorizontalAlignment="Left" Width="auto" >Название</TextBlock>
+                                                        </GridViewColumnHeader>
+                                                        <GridViewColumn.CellTemplate>
+                                                            <DataTemplate>
+                                                                <Grid >
+                                                                    <Grid.ColumnDefinitions>
+                                                                        <ColumnDefinition  Width="200" MaxWidth="300" ></ColumnDefinition>
+                                                                    </Grid.ColumnDefinitions>
+                                                                    <TextBlock Grid.Column="0" Text="{Binding MethodName}" TextWrapping="Wrap" />
+                                                                </Grid>
+                                                            </DataTemplate>
+                                                        </GridViewColumn.CellTemplate>
+                                                    </GridViewColumn>
+                                                    <GridViewColumn >
+                                                        <GridViewColumnHeader HorizontalContentAlignment="Left" >
+                                                            <TextBlock HorizontalAlignment="Left" Width="auto" >Значение</TextBlock>
+                                                        </GridViewColumnHeader>
+                                                        <GridViewColumn.CellTemplate>
+                                                            <DataTemplate>
+                                                                <Grid >
+                                                                    <Grid.ColumnDefinitions>
+                                                                        <ColumnDefinition Width="*" ></ColumnDefinition>
+                                                                    </Grid.ColumnDefinitions>
+                                                                    <TextBlock Grid.Column="0" Text="{Binding Value}" />
+                                                                </Grid>
+                                                            </DataTemplate>
+                                                        </GridViewColumn.CellTemplate>
+                                                    </GridViewColumn>
+
+                                                    <GridViewColumn >
+                                                        <GridViewColumnHeader HorizontalContentAlignment="Left" >
+                                                            <TextBlock HorizontalAlignment="Left" Width="auto" >Действие</TextBlock>
+                                                        </GridViewColumnHeader>
+                                                        <GridViewColumn.CellTemplate>
+                                                            <DataTemplate>
+                                                                <Grid >
+                                                                    <Grid.ColumnDefinitions>
+                                                                        <ColumnDefinition Width="*" ></ColumnDefinition>
+                                                                    </Grid.ColumnDefinitions>
+                                                                    <TextBlock Grid.Column="0" Text="{Binding PredictionDecision}" />
+                                                                </Grid>
+                                                            </DataTemplate>
+                                                        </GridViewColumn.CellTemplate>
+                                                    </GridViewColumn>
+
+
+                                                </GridView>
+                                            </ListView.View>
 
                                         </ListView>
+
                                     </Grid>
                                 </GroupBox>
                             </UserControl>
                             <UserControl Name="maTechnicalAnalysisDetails" Grid.Column="2">
-                                <GroupBox Margin="10" Header="Скользящие средние">
+                                <GroupBox Margin="10" Header="Скользящие средние" DataContext="{Binding MovingAveragesInfo}">
                                     <Grid>
-                                        <ListView>
+                                        <ListView ItemsSource="{Binding Predictions}">
+                                            <ListView.View >
+                                                <GridView >
+                                                    <GridViewColumn >
+                                                        <GridViewColumnHeader HorizontalContentAlignment="Left" Width="200" MaxWidth="300" >
+                                                            <TextBlock HorizontalAlignment="Left" Width="auto">Название</TextBlock>
+                                                        </GridViewColumnHeader>
+                                                        <GridViewColumn.CellTemplate  >
+                                                            <DataTemplate>
+                                                                <Grid >
+                                                                    <Grid.ColumnDefinitions>
+                                                                        <ColumnDefinition Width="200" MaxWidth="300" ></ColumnDefinition>
+                                                                    </Grid.ColumnDefinitions>
+                                                                    <TextBlock Grid.Column="0" Text="{Binding MethodName}" TextWrapping="Wrap" />
+                                                                </Grid>
+                                                            </DataTemplate>
+                                                        </GridViewColumn.CellTemplate>
+                                                    </GridViewColumn>
+                                                    <GridViewColumn >
+                                                        <GridViewColumnHeader HorizontalContentAlignment="Left" >
+                                                            <TextBlock HorizontalAlignment="Left" Width="auto" >Значение</TextBlock>
+                                                        </GridViewColumnHeader>
+                                                        <GridViewColumn.CellTemplate>
+                                                            <DataTemplate>
+                                                                <Grid >
+                                                                    <Grid.ColumnDefinitions>
+                                                                        <ColumnDefinition Width="*" ></ColumnDefinition>
+                                                                    </Grid.ColumnDefinitions>
+                                                                    <TextBlock Grid.Column="0" Text="{Binding Value}" />
+                                                                </Grid>
+                                                            </DataTemplate>
+                                                        </GridViewColumn.CellTemplate>
+                                                    </GridViewColumn>
+
+                                                    <GridViewColumn >
+                                                        <GridViewColumnHeader HorizontalContentAlignment="Left" >
+                                                            <TextBlock HorizontalAlignment="Left" Width="auto" >Действие</TextBlock>
+                                                        </GridViewColumnHeader>
+                                                        <GridViewColumn.CellTemplate>
+                                                            <DataTemplate>
+                                                                <Grid >
+                                                                    <Grid.ColumnDefinitions>
+                                                                        <ColumnDefinition Width="*" ></ColumnDefinition>
+                                                                    </Grid.ColumnDefinitions>
+                                                                    <TextBlock Grid.Column="0" Text="{Binding PredictionDecision}" />
+                                                                </Grid>
+                                                            </DataTemplate>
+                                                        </GridViewColumn.CellTemplate>
+                                                    </GridViewColumn>
+
+
+                                                </GridView>
+                                            </ListView.View>
 
                                         </ListView>
                                     </Grid>

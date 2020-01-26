@@ -22,6 +22,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Threading;
+using SmaDesktopTerminal.Classes.Analytics;
 
 namespace SmaDesktopTerminal.Models
 {
@@ -46,6 +47,11 @@ namespace SmaDesktopTerminal.Models
         private SeriesCollection seriesCollection;
         private SeriesCollection seriesVolumeCollection;
         private List<string> seriesLabels;
+        private InstrumentsAnalysisInfo movingAveragesInfo;
+        private InstrumentsAnalysisInfo oscillatorsInfo;
+        private InstrumentsAnalysisInfo mlAnalysisInfo;
+        private int minAxesVal = 0;
+        private int maxAxesVal = 1;
 
         public Person CurPerson
         {
@@ -171,6 +177,56 @@ namespace SmaDesktopTerminal.Models
         }
 
 
+        public InstrumentsAnalysisInfo MovingAveragesInfo
+        {
+            get => movingAveragesInfo;
+            set
+            {
+                movingAveragesInfo = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public InstrumentsAnalysisInfo OscillatorsInfo
+        {
+            get => oscillatorsInfo;
+            set
+            {
+                oscillatorsInfo = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public InstrumentsAnalysisInfo MlAnalysisInfo
+        {
+            get => mlAnalysisInfo;
+            set
+            {
+                mlAnalysisInfo = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public int MinAxesVal
+        {
+            get => minAxesVal;
+            set
+            {
+                minAxesVal = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public int MaxAxesVal
+        {
+            get => maxAxesVal;
+            set
+            {
+                maxAxesVal = value;
+                OnPropertyChanged();
+            }
+        }
+
         public TerminalWindowModel(AppMainModel mainModel)
         {
             this.mainModel = mainModel;
@@ -277,11 +333,16 @@ namespace SmaDesktopTerminal.Models
         }
 
 
-        public async void ReloadCandlesAsync()
+        public void InstrumentSelectionChanged()
+        {
+            ReloadCandlesForChart();
+            ReloadInstrumentAnalysis();
+        }
+
+        private async void ReloadCandlesForChart()
         {
             try
             {
-
                 try
                 {
                     if (SelectedInstrument == null)
@@ -298,7 +359,8 @@ namespace SmaDesktopTerminal.Models
                         DateStart = new DateTime(2019, 1, 1),
                         DateEnd = new DateTime(2020, 1, 1)
                     };
-                    var res = await CallRest.PostAsync<CandlesRequest, CandlesResponse>($"{urlToService}api/v1/market/candles", candlesRequest, httpClientService);
+                    var res = await CallRest.PostAsync<CandlesRequest, CandlesResponse>($"{urlToService}api/v1/market/candles",
+                        candlesRequest, httpClientService);
 
                     if (res?.Response?.Candles?.Any() == true)
                     {
@@ -309,18 +371,74 @@ namespace SmaDesktopTerminal.Models
                 }
                 catch (Exception ex)
                 {
-
                 }
 
 
                 ///api/v{version}/market/candles
-
             }
             catch (Exception ex)
             {
-
             }
         }
+
+        private async void ReloadInstrumentAnalysis()
+        {
+            try
+            {
+                try
+                {
+                    if (SelectedInstrument == null)
+                    {
+                        return;
+                    }
+
+
+                    //desktopTerminalWindow.chartProgressBar.Visibility = System.Windows.Visibility.Visible;
+                    var predictionRequest = new PredictionRequest()
+                    {
+                        InstrumentId = (uint)SelectedInstrument.FinamEmitentIDInt,
+                        Interval = selectedChartInterval,
+                    };
+
+                    var res = await CallRest.PostAsync<PredictionRequest, PredictionResponse>($"{urlToService}api/v1/market/analytics/GetPredictionFor",
+                        predictionRequest, httpClientService);
+                    res.Response.Predictions.ForEach(r => r.PredictionDecision = TranslatePredictionDecision(r.PredictionDecision));
+
+                    var grouped = res.Response.Predictions.GroupBy(r => r.IndicatorType);
+                    var dict = grouped
+                        .ToDictionary(r => r.Key, r => r.ToList());
+
+
+                    dict.TryGetValue(1, out var movingAvg);
+                    MovingAveragesInfo = new InstrumentsAnalysisInfo(movingAvg);
+
+                    dict.TryGetValue(2, out var oscillator);
+                    OscillatorsInfo = new InstrumentsAnalysisInfo(oscillator);
+
+                    dict.TryGetValue(3, out var mlMethods);
+                    MlAnalysisInfo = new InstrumentsAnalysisInfo(mlMethods);
+
+
+                    //if (res?.Response?.Candles?.Any() == true)
+                    //{
+                    //    FillPlotByNewData(res.Response);
+                    //}
+
+                    desktopTerminalWindow.chartProgressBar.Visibility = System.Windows.Visibility.Hidden;
+                }
+                catch (Exception ex)
+                {
+                }
+
+
+                ///api/v{version}/market/candles
+            }
+            catch (Exception ex)
+            {
+            }
+        }
+
+
 
         //private void FillPlotByNewData(CandlesResponse candlesResponse)
         //{
@@ -415,13 +533,27 @@ namespace SmaDesktopTerminal.Models
                 labels.Add(oneCandle.Date.ToString());
             }
 
+
+
             SeriesCollection.Add(series);
             SeriesVolumeCollection.Add(volumeSeries);
             Labels = labels;
-            //desktopTerminalWindow.liveChartOhlc.AxisX[0].MinValue = desktopTerminalWindow.liveChartOhlc.AxisX[0].MaxValue - 1;
-
-            //desktopTerminalWindow.liveChartOhlc.AxisX[0].SetRange(30, 30);
+            MaxAxesVal = 100;
+            MinAxesVal = 70;
         }
+
+
+        private string TranslatePredictionDecision(string oldValue)
+        {
+            switch (oldValue)
+            {
+                case "Sell": return "Продавать";
+                case "Buy": return "Покупать";
+                case "Neutral": return "Держать";
+                default: return oldValue;
+            }
+        }
+
 
         private void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
