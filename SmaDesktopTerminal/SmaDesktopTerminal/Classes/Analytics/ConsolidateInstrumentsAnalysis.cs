@@ -51,9 +51,9 @@ namespace SmaDesktopTerminal.Classes.Analytics
             var allClassesCnt = buyCnt + sellCnt + neutralCnt;
             var classSum = (int)buyCnt - sellCnt;
 
-            var intervalClass = 2 * allClassesCnt / 5;
+            var intervalClass = 2 * (double)allClassesCnt / 5;
 
-            var leftInterval = -1 * allClassesCnt;
+            var leftInterval = -1d * allClassesCnt;
             var rightInterval = leftInterval + intervalClass;
             for (var i = 1; i <= 5; i++)
             {

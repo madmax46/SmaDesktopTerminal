@@ -130,12 +130,12 @@
                                 </oxy:PlotView>-->
                                 <lvc:CartesianChart Name="liveChartOhlc" Grid.Row="0" ScrollMode="X" Zoom="X" Series="{Binding SeriesCollection}" Margin="10,10" >
                                     <lvc:CartesianChart.AxisX>
-                                        <lvc:Axis Labels="{Binding Labels}" Separator="{x:Static lvc:DefaultAxes.CleanSeparator}"  Title="Time" MinValue="{Binding MinAxesVal}" MaxValue="{Binding MaxAxesVal}"  RangeChanged="Axis_RangeChanged" HorizontalAlignment="Left"/>
+                                        <lvc:Axis Labels="{Binding Labels}" Separator="{x:Static lvc:DefaultAxes.CleanSeparator}"  Title="Time" MinValue="{Binding MinAxesVal, Mode=TwoWay}" MaxValue="{Binding MaxAxesVal, Mode=TwoWay}"  RangeChanged="Axis_RangeChanged" HorizontalAlignment="Left"/>
                                     </lvc:CartesianChart.AxisX>
                                 </lvc:CartesianChart>
                                 <lvc:CartesianChart Name="liveChartVolume" Grid.Row="1" Series="{Binding SeriesVolumeCollection}" Margin="10,10" >
                                     <lvc:CartesianChart.AxisX>
-                                        <lvc:Axis Labels="{Binding Labels}" MinValue="{Binding MinAxesVal}" MaxValue="{Binding MaxAxesVal}"/>
+                                        <lvc:Axis Labels="{Binding Labels}" MinValue="{Binding MinAxesVal, Mode=TwoWay}" MaxValue="{Binding MaxAxesVal, Mode=TwoWay}"/>
                                     </lvc:CartesianChart.AxisX>
                                 </lvc:CartesianChart>
                             </Grid>
@@ -180,6 +180,8 @@
                         <RadioButton Grid.Column="6" Height="30" Width="60" VerticalAlignment="Center" Style="{StaticResource {x:Type ToggleButton}}">day</RadioButton>
                         <RadioButton Grid.Column="7" Height="30" Width="60" VerticalAlignment="Center" Style="{StaticResource {x:Type ToggleButton}}">week</RadioButton>
                         <RadioButton Grid.Column="8" Height="30" Width="60" VerticalAlignment="Center" Style="{StaticResource {x:Type ToggleButton}}">month</RadioButton>
+                        <!--<Button Name="instrumentAnalysisUpdateBtn" Grid.Column="9" Click="instrumentsUpdateBtn_Click" Margin="3" Style="{DynamicResource ButtonUpdateStyle}"/>-->
+
                     </Grid>
                     <Grid Grid.Row="1">
                         <Grid.RowDefinitions>

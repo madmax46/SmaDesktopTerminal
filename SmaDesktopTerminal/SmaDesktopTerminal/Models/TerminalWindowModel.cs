@@ -22,7 +22,10 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Threading;
+using ExchCommonLib.Classes;
+using ExchCommonLib.Enums;
 using SmaDesktopTerminal.Classes.Analytics;
+using ColumnSeries = LiveCharts.Wpf.ColumnSeries;
 
 namespace SmaDesktopTerminal.Models
 {
@@ -481,15 +484,12 @@ namespace SmaDesktopTerminal.Models
 
 
         //}
-        private void FillPlotByNewData(CandlesResponse candlesResponse)
+        private async void FillPlotByNewData(CandlesResponse candlesResponse)
         {
-            //SeriesCollection = new SeriesCollection();
-            //SeriesVolumeCollection = new SeriesCollection();
-            //Labels = new List<string>();
-
-            SeriesCollection = new SeriesCollection();
+            SeriesCollection = new SeriesCollection(); //если хочешь обновлять данные, то удали это
             SeriesVolumeCollection = new SeriesCollection();
             Labels = new List<string>();
+
 
             var series = new CandleSeries()
             {
@@ -502,44 +502,63 @@ namespace SmaDesktopTerminal.Models
                 Values = new ChartValues<double>()
             };
 
-            var labels = new List<string>();
+            //if (SeriesCollection.Any()) // можно спокойно добавлять объекты в коллекцию
+            //series = (CandleSeries)SeriesCollection[0];
+            var skipCnt = candlesResponse.Candles.Count - 100;
+            candlesResponse.Candles = candlesResponse.Candles.Skip(skipCnt).Take(100).ToList();
 
-            //  VolumeStyle volumeStyle = VolumeStyle.Stacked;
-            //var series = new CandleStickAndVolumeSeries
-            //{
-            //    PositiveColor = OxyColors.Green,
-            //    NegativeColor = OxyColors.Red,
-            //    PositiveHollow = false,
-            //    NegativeHollow = false,
-            //    SeparatorColor = OxyColors.Gray,
-            //    SeparatorLineStyle = LineStyle.Dash,
-            //    VolumeStyle = volumeStyle,
-            //    //StrokeThickness = 3
-            //};
-            //CandlesChart.Series.Clear();
-            //CandlesChart.Series.Add(series);
-            //series.
-            //GearedValues
-            //desktopTerminalWindow.liveChartOhlc. = ScrollMode.X;
+            var labels = await FillSeriesBeforeShow(candlesResponse, series, volumeSeries);
 
+            MaxAxesVal = candlesResponse.Candles.Count;
+            //MaxAxesVal = 30;
+            MinAxesVal = MaxAxesVal - 30;
 
-            //GearedValues
-
-            foreach (var oneCandle in candlesResponse.Candles.Take(100))
-            {
-                var time = DateTimeAxis.ToDouble(oneCandle.Date);
-                series.Values.Add(new OhlcPoint(oneCandle.Open, oneCandle.High, oneCandle.Low, oneCandle.Close));
-                volumeSeries.Values.Add((double)oneCandle.Volume);
-                labels.Add(oneCandle.Date.ToString());
-            }
-
-
+            //if (!seriesCollection.Any())
+            //    SeriesCollection.Add(series);
+            //else
+            //    SeriesCollection[0] = series;
 
             SeriesCollection.Add(series);
             SeriesVolumeCollection.Add(volumeSeries);
             Labels = labels;
-            MaxAxesVal = 100;
-            MinAxesVal = 70;
+            MaxAxesVal = candlesResponse.Candles.Count;
+            MinAxesVal = MaxAxesVal - 30;
+        }
+
+        private Task<List<string>> FillSeriesBeforeShow(CandlesResponse candlesResponse, CandleSeries candleSeries, ColumnSeries volumeSeries)
+        {
+            var task = new Task<List<string>>(
+                () =>
+                {
+                    //var series = new CandleSeries()
+                    //{
+                    //    Values = new ChartValues<OhlcPoint>(),
+                    //};
+
+                    //var volumeSeries = new LiveCharts.Wpf.ColumnSeries()
+                    //{
+                    //    Title = "Объем",
+                    //    Values = new ChartValues<double>()
+                    //};
+                    var firstCandle = candlesResponse.Candles.First();
+                    var labels = new List<string>();
+                    var dtFormat = "dd.MM.yyyy HH:mm";
+                    if (firstCandle.Interval == CandlesInterval.Day || firstCandle.Interval == CandlesInterval.Week || firstCandle.Interval == CandlesInterval.Month)
+                        dtFormat = "dd.MM.yyyy";
+
+                    //GearedValues
+                    foreach (var oneCandle in candlesResponse.Candles)
+                    {
+                        candleSeries.Values.Add(new OhlcPoint(oneCandle.Open, oneCandle.High, oneCandle.Low, oneCandle.Close));
+                        volumeSeries.Values.Add((double)oneCandle.Volume);
+                        labels.Add(oneCandle.Date.ToString(dtFormat));
+                    }
+
+                    return labels;
+                });
+
+            task.Start();
+            return task;
         }
 
 
