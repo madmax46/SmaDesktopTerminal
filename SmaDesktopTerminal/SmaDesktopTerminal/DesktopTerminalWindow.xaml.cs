@@ -82,7 +82,7 @@ namespace SmaDesktopTerminal
 
         private void chartUpdateBtn_Click(object sender, RoutedEventArgs e)
         {
-            windowModel.InstrumentSelectionChanged();
+            windowModel.ChartRefresh();
         }
 
         private void Axis_RangeChanged(LiveCharts.Events.RangeChangedEventArgs eventArgs)
@@ -103,6 +103,11 @@ namespace SmaDesktopTerminal
             //this.liveChartVolume.AxisX[0].MaxValue = max;
 
             //Repeat for as many graphs as you have
+        }
+
+        private void ChartIntervalComboBox_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            windowModel.InstrumentIntervalChanged();
         }
     }
 }

@@ -21,6 +21,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Threading;
 using ExchCommonLib.Classes;
 using ExchCommonLib.Enums;
@@ -34,7 +35,6 @@ namespace SmaDesktopTerminal.Models
         private readonly AppMainModel mainModel;
 
         private readonly string urlToService;
-        private readonly string authToken;
         private readonly HttpClient httpClientService;
         private readonly DesktopTerminalWindow desktopTerminalWindow;
 
@@ -55,6 +55,10 @@ namespace SmaDesktopTerminal.Models
         private InstrumentsAnalysisInfo mlAnalysisInfo;
         private int minAxesVal = 0;
         private int maxAxesVal = 1;
+        private Visibility analyseProgressBarVisibility;
+        private Visibility instrumentsProgressBarVisibility;
+        private Visibility chartProgressBarVisibility;
+        private string selectedIntervalForAnalysis;
 
         public Person CurPerson
         {
@@ -230,10 +234,55 @@ namespace SmaDesktopTerminal.Models
             }
         }
 
+
+        public Visibility AnalyseProgressBarVisibility
+        {
+            get => analyseProgressBarVisibility;
+            set
+            {
+                analyseProgressBarVisibility = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public Visibility InstrumentsProgressBarVisibility
+        {
+            get => instrumentsProgressBarVisibility;
+            set
+            {
+                instrumentsProgressBarVisibility = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public Visibility ChartProgressBarVisibility
+        {
+            get => chartProgressBarVisibility;
+            set
+            {
+                chartProgressBarVisibility = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public string SelectedIntervalForAnalysis
+        {
+            get => selectedIntervalForAnalysis;
+            set
+            {
+                var isNeedReload = selectedIntervalForAnalysis != value;
+                selectedIntervalForAnalysis = value;
+                OnPropertyChanged();
+
+                if (isNeedReload)
+                    ReloadInstrumentAnalysis();
+            }
+        }
+
         public TerminalWindowModel(AppMainModel mainModel)
         {
             this.mainModel = mainModel;
-            authToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoibWFkbWF4IiwiaHR0cDovL3NjaGVtYXMubWljcm9zb2Z0LmNvbS93cy8yMDA4LzA2L2lkZW50aXR5L2NsYWltcy9yb2xlIjoiYWRtaW4iLCJpc3MiOiJTbWFBdXRoU2VydmljZSIsImF1ZCI6Imh0dHA6Ly9sb2NhbGhvc3QvIn0.h5yBoP5P0GFuR-E2pv4fF-A1FQXcIy2HB_dvJ1vycA8";
+            var authToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoibWFkbWF4IiwiaHR0cDovL3NjaGVtYXMubWljcm9zb2Z0LmNvbS93cy8yMDA4LzA2L2lkZW50aXR5L2NsYWltcy9yb2xlIjoiYWRtaW4iLCJpc3MiOiJTbWFBdXRoU2VydmljZSIsImF1ZCI6Imh0dHA6Ly9sb2NhbGhvc3QvIn0.h5yBoP5P0GFuR-E2pv4fF-A1FQXcIy2HB_dvJ1vycA8";
             urlToService = "http://localhost:4000/";
 
             httpClientService = new HttpClient();
@@ -245,6 +294,10 @@ namespace SmaDesktopTerminal.Models
             SeriesCollection = new SeriesCollection();
             SeriesVolumeCollection = new SeriesCollection();
             Labels = new List<string>();
+
+            AnalyseProgressBarVisibility = Visibility.Hidden;
+            InstrumentsProgressBarVisibility = Visibility.Hidden;
+            ChartProgressBarVisibility = Visibility.Hidden;
 
             desktopTerminalWindow = new DesktopTerminalWindow(this);
             desktopTerminalWindow.Show();
@@ -272,23 +325,26 @@ namespace SmaDesktopTerminal.Models
         {
             try
             {
-                desktopTerminalWindow.instrumentsProgressBar.Visibility = System.Windows.Visibility.Visible;
+                InstrumentsProgressBarVisibility = Visibility.Visible;
+                //desktopTerminalWindow.InstrumentsProgressBar.Visibility = System.Windows.Visibility.Visible;
                 instruments.Clear();
-                var res = await CallRest.GetAsync<InstrumentsResponse>($"{urlToService}api/v1/market/GetParsedInstruments", httpClientService);
-                //Thread.Sleep(10000);
+                var res = await CallRest.GetAsync<InstrumentsResponse>(
+                    $"{urlToService}api/v1/market/GetParsedInstruments", httpClientService);
+
                 if (res?.Response?.Instruments?.Any() == true)
                 {
                     res.Response.Instruments.ForEach(r => Instruments.Add(r));
                 }
-
-                desktopTerminalWindow.instrumentsProgressBar.Visibility = System.Windows.Visibility.Hidden;
             }
             catch (Exception ex)
             {
 
             }
+            finally
+            {
+                InstrumentsProgressBarVisibility = Visibility.Hidden;
+            }
         }
-
 
 
         public void ReloadCandles()
@@ -341,6 +397,14 @@ namespace SmaDesktopTerminal.Models
             ReloadCandlesForChart();
             ReloadInstrumentAnalysis();
         }
+        public void ChartRefresh()
+        {
+            ReloadCandlesForChart();
+        }
+        public void InstrumentIntervalChanged()
+        {
+            ReloadCandlesForChart();
+        }
 
         private async void ReloadCandlesForChart()
         {
@@ -353,16 +417,17 @@ namespace SmaDesktopTerminal.Models
                         return;
                     }
 
+                    ChartProgressBarVisibility = Visibility.Visible;
 
-                    desktopTerminalWindow.chartProgressBar.Visibility = System.Windows.Visibility.Visible;
-                    CandlesRequest candlesRequest = new CandlesRequest()
+                    var candlesRequest = new CandlesRequest()
                     {
                         InstrumentId = (uint)SelectedInstrument.FinamEmitentIDInt,
                         Interval = selectedChartInterval,
-                        DateStart = new DateTime(2019, 1, 1),
-                        DateEnd = new DateTime(2020, 1, 1)
+                        DateStart = DateTime.Now.AddYears(-1),
+                        DateEnd = DateTime.Now.AddDays(1)
                     };
-                    var res = await CallRest.PostAsync<CandlesRequest, CandlesResponse>($"{urlToService}api/v1/market/candles",
+                    var res = await CallRest.PostAsync<CandlesRequest, CandlesResponse>(
+                        $"{urlToService}api/v1/market/candles",
                         candlesRequest, httpClientService);
 
                     if (res?.Response?.Candles?.Any() == true)
@@ -370,10 +435,13 @@ namespace SmaDesktopTerminal.Models
                         FillPlotByNewData(res.Response);
                     }
 
-                    desktopTerminalWindow.chartProgressBar.Visibility = System.Windows.Visibility.Hidden;
                 }
                 catch (Exception ex)
                 {
+                }
+                finally
+                {
+                    ChartProgressBarVisibility = Visibility.Hidden;
                 }
 
 
@@ -395,17 +463,20 @@ namespace SmaDesktopTerminal.Models
                         return;
                     }
 
+                    AnalyseProgressBarVisibility = Visibility.Visible;
 
                     //desktopTerminalWindow.chartProgressBar.Visibility = System.Windows.Visibility.Visible;
                     var predictionRequest = new PredictionRequest()
                     {
                         InstrumentId = (uint)SelectedInstrument.FinamEmitentIDInt,
-                        Interval = selectedChartInterval,
+                        Interval = SelectedIntervalForAnalysis,
                     };
 
-                    var res = await CallRest.PostAsync<PredictionRequest, PredictionResponse>($"{urlToService}api/v1/market/analytics/GetPredictionFor",
+                    var res = await CallRest.PostAsync<PredictionRequest, PredictionResponse>(
+                        $"{urlToService}api/v1/market/analytics/GetPredictionFor",
                         predictionRequest, httpClientService);
-                    res.Response.Predictions.ForEach(r => r.PredictionDecision = TranslatePredictionDecision(r.PredictionDecision));
+                    res.Response.Predictions.ForEach(r =>
+                        r.PredictionDecision = TranslatePredictionDecision(r.PredictionDecision));
 
                     var grouped = res.Response.Predictions.GroupBy(r => r.IndicatorType);
                     var dict = grouped
@@ -427,12 +498,16 @@ namespace SmaDesktopTerminal.Models
                     //    FillPlotByNewData(res.Response);
                     //}
 
-                    desktopTerminalWindow.chartProgressBar.Visibility = System.Windows.Visibility.Hidden;
+                    desktopTerminalWindow.ChartProgressBar.Visibility = System.Windows.Visibility.Hidden;
                 }
                 catch (Exception ex)
                 {
                 }
+                finally
+                {
+                    AnalyseProgressBarVisibility = Visibility.Hidden;
 
+                }
 
                 ///api/v{version}/market/candles
             }
@@ -569,6 +644,7 @@ namespace SmaDesktopTerminal.Models
                 case "Sell": return "Продавать";
                 case "Buy": return "Покупать";
                 case "Neutral": return "Держать";
+                case "Unknown": return "--";
                 default: return oldValue;
             }
         }
