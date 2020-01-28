@@ -34,6 +34,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>Terminal_23658.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -61,11 +64,15 @@
     <Compile Include="Classes\Person.cs" />
     <Compile Include="Classes\ServiceResponses\InstrumentsResponse.cs" />
     <Compile Include="Models\TerminalWindowModel.cs" />
+    <Compile Include="Models\ThemesController.cs" />
     <Compile Include="Windows\CircularProgressBar.xaml.cs">
       <DependentUpon>CircularProgressBar.xaml</DependentUpon>
     </Compile>
     <Compile Include="Windows\LogInWindow.xaml.cs">
       <DependentUpon>LogInWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\SwitchCheckControl.xaml.cs">
+      <DependentUpon>SwitchCheckControl.xaml</DependentUpon>
     </Compile>
     <Page Include="DesktopTerminalWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -84,6 +91,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Windows\LogInWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Windows\SwitchCheckControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -144,11 +155,16 @@
       <Version>2.0.0</Version>
     </PackageReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Resource Include="terminal_16406.ico" />
+  </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\button_refresh_15001.ico">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Terminal_23658.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

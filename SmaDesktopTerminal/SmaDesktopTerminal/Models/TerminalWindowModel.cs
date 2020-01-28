@@ -139,6 +139,10 @@ namespace SmaDesktopTerminal.Models
 
         }
 
+        internal void LogOut()
+        {
+            //throw new NotImplementedException();
+        }
 
         public SeriesCollection SeriesCollection
         {
@@ -430,6 +434,9 @@ namespace SmaDesktopTerminal.Models
                         $"{urlToService}api/v1/market/candles",
                         candlesRequest, httpClientService);
 
+                    if (candlesRequest.InstrumentId != (uint)SelectedInstrument.FinamEmitentIDInt)
+                        return;
+
                     if (res?.Response?.Candles?.Any() == true)
                     {
                         FillPlotByNewData(res.Response);
@@ -477,6 +484,9 @@ namespace SmaDesktopTerminal.Models
                         predictionRequest, httpClientService);
                     res.Response.Predictions.ForEach(r =>
                         r.PredictionDecision = TranslatePredictionDecision(r.PredictionDecision));
+
+                    if (predictionRequest.InstrumentId != (uint)SelectedInstrument.FinamEmitentIDInt)
+                        return;
 
                     var grouped = res.Response.Predictions.GroupBy(r => r.IndicatorType);
                     var dict = grouped
