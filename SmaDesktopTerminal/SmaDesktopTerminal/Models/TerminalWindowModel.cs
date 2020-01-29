@@ -24,8 +24,10 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
 using ExchCommonLib.Classes;
+using ExchCommonLib.Classes.UserPortfolio;
 using ExchCommonLib.Enums;
 using SmaDesktopTerminal.Classes.Analytics;
+using SmaDesktopTerminal.Classes.Interface;
 using ColumnSeries = LiveCharts.Wpf.ColumnSeries;
 
 namespace SmaDesktopTerminal.Models
@@ -59,6 +61,8 @@ namespace SmaDesktopTerminal.Models
         private Visibility instrumentsProgressBarVisibility;
         private Visibility chartProgressBarVisibility;
         private string selectedIntervalForAnalysis;
+        private PortfolioUserController portfolioUserController;
+        private OperationUserController operationUserControllerInst;
 
         public Person CurPerson
         {
@@ -81,6 +85,8 @@ namespace SmaDesktopTerminal.Models
             set
             {
                 instruments = value;
+                if (OperationUserControllerInst != null)
+                    OperationUserControllerInst.Instruments = value;
                 OnPropertyChanged();
             }
 
@@ -283,6 +289,26 @@ namespace SmaDesktopTerminal.Models
             }
         }
 
+        public PortfolioUserController PortfolioUserControllerInst
+        {
+            get => portfolioUserController;
+            set
+            {
+                portfolioUserController = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public OperationUserController OperationUserControllerInst
+        {
+            get => operationUserControllerInst;
+            set
+            {
+                operationUserControllerInst = value;
+                OnPropertyChanged();
+            }
+        }
+
         public TerminalWindowModel(AppMainModel mainModel)
         {
             this.mainModel = mainModel;
@@ -302,6 +328,17 @@ namespace SmaDesktopTerminal.Models
             AnalyseProgressBarVisibility = Visibility.Hidden;
             InstrumentsProgressBarVisibility = Visibility.Hidden;
             ChartProgressBarVisibility = Visibility.Hidden;
+
+            OperationUserControllerInst = new OperationUserController(Instruments);
+            OperationUserControllerInst.BuyOperationToClick = new BuyOperationToClick(new Action<string>((r) =>
+            {
+
+            }));
+
+            OperationUserControllerInst.SellOperationToClick = new SellOperationToClick(new Action<string>((r) =>
+             {
+
+             }));
 
             desktopTerminalWindow = new DesktopTerminalWindow(this);
             desktopTerminalWindow.Show();
@@ -324,6 +361,48 @@ namespace SmaDesktopTerminal.Models
                 "month"
             };
         }
+
+
+        public void WindowLoaded()
+        {
+            ReloadUserPortfolioAsync();
+            ReloadParsedInstrumentsAsync();
+        }
+
+
+        public async void ReloadUserPortfolioAsync()
+        {
+            try
+            {
+                PortfolioUserControllerInst = new PortfolioUserController
+                {
+                    PortfolioProgressBarVisibility = Visibility.Visible
+                };
+
+                var res = await CallRest.GetAsync<Portfolio>(
+                    $"{urlToService}api/v1/portfolio/GetPortfolio", httpClientService);
+
+                if (res?.Response == null)
+                    return;
+
+                if (res?.Response?.Positions?.Any() == true)
+                {
+                    res.Response.Positions.ForEach(r => PortfolioUserControllerInst.Positions.Add(r));
+                }
+
+                PortfolioUserControllerInst.TotalAmount = res.Response.TotalAmount;
+            }
+            catch (Exception ex)
+            {
+
+            }
+            finally
+            {
+                PortfolioUserControllerInst.PortfolioProgressBarVisibility = Visibility.Hidden;
+            }
+        }
+
+
 
         public async void ReloadParsedInstrumentsAsync()
         {

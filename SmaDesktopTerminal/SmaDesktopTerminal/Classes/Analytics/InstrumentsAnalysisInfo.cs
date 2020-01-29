@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using ExchCommonLib.Analytics;
 using ExchCommonLib.Classes;
 
 namespace SmaDesktopTerminal.Classes.Analytics

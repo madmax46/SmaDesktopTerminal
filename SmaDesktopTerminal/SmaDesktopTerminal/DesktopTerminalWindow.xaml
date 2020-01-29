@@ -35,13 +35,12 @@
             <TabItem Header="Портфель">
                 <Grid Style="{DynamicResource MainGridStyle }">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="600" MinWidth="600"></ColumnDefinition>
+                        <ColumnDefinition Width="600*" MinWidth="600"></ColumnDefinition>
                         <ColumnDefinition Width="400"></ColumnDefinition>
-                        <ColumnDefinition Width="1*" />
                     </Grid.ColumnDefinitions>
 
                     <Grid Column="0" Style="{DynamicResource MainGridStyle }">
-                        <UserControl Name="UserPortfolio" Margin="10,10,2,10" BorderBrush="Black" BorderThickness="1" Padding="5" >
+                        <UserControl Name="UserPortfolio" Margin="10,10,2,10" BorderBrush="Black" BorderThickness="1" Padding="5" DataContext="{Binding PortfolioUserControllerInst}"  >
                             <Grid>
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="35"></RowDefinition>
@@ -49,19 +48,21 @@
                                 </Grid.RowDefinitions>
                                 <Grid Row="0">
                                     <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="230"></ColumnDefinition>
-                                        <ColumnDefinition Width="1*"></ColumnDefinition>
+                                        <ColumnDefinition Width="160"></ColumnDefinition>
+                                        <ColumnDefinition Width="100"></ColumnDefinition>
+                                        <ColumnDefinition/>
                                         <ColumnDefinition Width="35"></ColumnDefinition>
                                         <ColumnDefinition Width="35"></ColumnDefinition>
                                         <ColumnDefinition Width="8"></ColumnDefinition>
                                     </Grid.ColumnDefinitions>
-                                    <TextBlock VerticalAlignment="Center" Margin="10,0,0,0" Style="{DynamicResource MaiTextBlockStyle}" Height="auto">Содержимое портфеля</TextBlock>
-                                    <Button Name="PortfolioUpdateBtn" Grid.Column="3"  Click="PortfolioUpdateBtn_OnClick"  Margin="3" Style="{DynamicResource ButtonUpdateStyle}" />
-                                    <windows:CircularProgressBar x:Name="PortfolioProgressBar" Grid.Column="2" HorizontalAlignment="Center" Visibility="{Binding PortfolioProgressBarVisibility}" />
-                                    <Line Stretch="Fill" VerticalAlignment="Bottom" X2="1" Fill="Black" HorizontalAlignment="Stretch" Grid.Column="0" Grid.ColumnSpan="5" Margin="5,0" StrokeThickness="1"  Stroke="Black" Height="1"/>
+                                    <TextBlock VerticalAlignment="Center" Margin="10,8,0,7" Style="{DynamicResource MaiTextBlockStyle}" Height="20">Стоимость портфеля</TextBlock>
+                                    <TextBlock Grid.Column="1" VerticalAlignment="Center" Margin="10,8,0,7" Style="{DynamicResource MaiTextBlockStyle}" Height="20" Text="{Binding TotalAmount}"/>
+                                    <windows:CircularProgressBar x:Name="PortfolioProgressBar" Grid.Column="3" HorizontalAlignment="Center" Visibility="{Binding PortfolioProgressBarVisibility}" Height="Auto" />
+                                    <Button Name="PortfolioUpdateBtn" Grid.Column="4"  Click="PortfolioUpdateBtn_OnClick"  Margin="3" Style="{DynamicResource ButtonUpdateStyle}" />
+                                    <Line Stretch="Fill" VerticalAlignment="Bottom" X2="1" Fill="Black" HorizontalAlignment="Stretch" Grid.Column="0" Grid.ColumnSpan="6" Margin="5,0" StrokeThickness="1"  Stroke="Black" Height="1"/>
                                 </Grid>
                                 <Grid Row="1">
-                                    <ListView Name="PortfolioInstrView" ItemsSource="{Binding Instruments}" SelectionMode="Single" SelectedItem="{Binding SelectedInstrument , Mode=TwoWay}" SelectionChanged="PortfolioInstrView_OnSelectionChanged" Background="Transparent" SizeChanged="ListView_SizeChanged" ItemContainerStyle="{DynamicResource ListViewItemStyle}" Margin="0,5,0,0" BorderThickness="0" >
+                                    <ListView Name="PortfolioInstrView" ItemsSource="{Binding Positions}" SelectionMode="Single" SelectedItem="{Binding SelectedPortfolioItem , Mode=TwoWay}" SelectionChanged="PortfolioInstrView_OnSelectionChanged" Background="Transparent" SizeChanged="ListView_SizeChanged" ItemContainerStyle="{DynamicResource ListViewItemStyle}" Margin="0,5,0,0" BorderThickness="0" >
                                         <ListView.View>
                                             <GridView >
                                                 <GridViewColumn  Width="130">
@@ -135,7 +136,7 @@
                                                                 <Grid.ColumnDefinitions >
                                                                     <ColumnDefinition Width="*" ></ColumnDefinition>
                                                                 </Grid.ColumnDefinitions>
-                                                                <TextBlock Grid.Column="0" Text="{Binding Price}" Style="{DynamicResource MaiTextBlockStyle}"/>
+                                                                <TextBlock Grid.Column="0" Text="{Binding CurСost}" Style="{DynamicResource MaiTextBlockStyle}"/>
                                                             </Grid>
                                                         </DataTemplate>
                                                     </GridViewColumn.CellTemplate>
@@ -187,6 +188,70 @@
                             <RowDefinition></RowDefinition>
                             <RowDefinition></RowDefinition>
                         </Grid.RowDefinitions>
+
+                        <Grid Row="0" >
+                            <UserControl Name="OperationUserControl" Margin="10,10,2,10" BorderBrush="Black" BorderThickness="1" Padding="5" DataContext="{Binding OperationUserControllerInst}"  >
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="35"></RowDefinition>
+                                        <RowDefinition></RowDefinition>
+                                    </Grid.RowDefinitions>
+                                    <Grid Row="0">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="200"></ColumnDefinition>
+                                            <ColumnDefinition/>
+                                            <ColumnDefinition Width="35"></ColumnDefinition>
+                                            <ColumnDefinition Width="35"></ColumnDefinition>
+                                            <ColumnDefinition Width="8"></ColumnDefinition>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock VerticalAlignment="Center" Margin="10,8,0,7" Style="{DynamicResource MaiTextBlockStyle}" Height="20">Добавление операции</TextBlock>
+                                        <Line Stretch="Fill" VerticalAlignment="Bottom" X2="1" Fill="Black" HorizontalAlignment="Stretch" Grid.Column="0" Grid.ColumnSpan="6" Margin="5,0" StrokeThickness="1"  Stroke="Black" Height="1"/>
+                                    </Grid>
+                                    <Grid Row="1">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="50"></RowDefinition>
+                                            <RowDefinition Height="60"></RowDefinition>
+                                            <RowDefinition></RowDefinition>
+                                        </Grid.RowDefinitions>
+                                        <Grid Row="0" Margin="0,5,0,0" >
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="75"></ColumnDefinition>
+                                                <ColumnDefinition/>
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock HorizontalAlignment="Right" VerticalAlignment="Center" Style="{DynamicResource MaiTextBlockStyle}" Width="43" Height="26" Margin="0,10,10,9" >Актив:</TextBlock>
+                                            <ComboBox Grid.Column="1" SelectedIndex="0" VerticalAlignment="Center" HorizontalAlignment="Left" Width="200" Height="26" DataContext="{Binding Instruments}" ItemsSource="{Binding Name}" Margin="0,10,0,9" ></ComboBox>
+                                        </Grid>
+                                        <Grid Row="1">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition></ColumnDefinition>
+                                                <ColumnDefinition></ColumnDefinition>
+                                            </Grid.ColumnDefinitions>
+                                            <StackPanel Grid.Column="0"  Orientation="Vertical" Margin="10,0,10,0">
+                                                <TextBlock Margin="10,5" Style="{DynamicResource MaiTextBlockStyle}">Цена:</TextBlock>
+                                                <TextBox  Background="Transparent" Text="{Binding OperationPrice}"></TextBox>
+                                            </StackPanel>
+                                            <StackPanel Grid.Column="1" Orientation="Vertical" Margin="10,0,10,0">
+                                                <TextBlock Margin="10,5" Style="{DynamicResource MaiTextBlockStyle}" >Количество:</TextBlock>
+                                                <TextBox  Background="Transparent" Text="{Binding Count}"></TextBox>
+                                            </StackPanel>
+
+                                        </Grid>
+                                        <Grid Row="2">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition></ColumnDefinition>
+                                                <ColumnDefinition></ColumnDefinition>
+                                            </Grid.ColumnDefinitions>
+                                            <Button Grid.Column="0" Width="120" Height="50" Command="{Binding BuyOperationToClick}">Покупка</Button>
+                                            <Button Grid.Column="1" Width="120" Height="50" Command="{Binding SellOperationToClick}">Продажа</Button>
+                                        </Grid>
+                                    </Grid>
+
+                                </Grid>
+
+                            </UserControl>
+
+                        </Grid>
+
                     </Grid>
                     <GridSplitter Grid.Column="0" Height="Auto" Width="2" VerticalAlignment="Stretch" HorizontalAlignment="Right" Background="Transparent" />
 

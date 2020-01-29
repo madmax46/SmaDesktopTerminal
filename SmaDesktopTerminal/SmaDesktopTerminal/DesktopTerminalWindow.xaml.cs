@@ -66,8 +66,7 @@ namespace SmaDesktopTerminal
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            windowModel.ReloadParsedInstrumentsAsync();
-
+            windowModel.WindowLoaded();
         }
 
         private void Button_Click_1(object sender, RoutedEventArgs e)
@@ -154,7 +153,7 @@ namespace SmaDesktopTerminal
 
         private void PortfolioUpdateBtn_OnClick(object sender, RoutedEventArgs e)
         {
-            throw new NotImplementedException();
+            windowModel.ReloadUserPortfolioAsync();
         }
 
         private void PortfolioInstrView_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
