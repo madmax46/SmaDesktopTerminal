@@ -20,6 +20,8 @@ namespace SmaDesktopTerminal.Classes.Interface
 
         private double operationPrice;
         private ObservableCollection<Instrument> instruments;
+        private Instrument selectedInstrument;
+        private DateTime date;
 
         //private PortfolioItem selectedPortfolioItem;
 
@@ -46,7 +48,15 @@ namespace SmaDesktopTerminal.Classes.Interface
             }
         }
 
-
+        public DateTime Date
+        {
+            get => date;
+            set
+            {
+                date = value;
+                OnPropertyChanged();
+            }
+        }
 
 
         public BuyOperationToClick BuyOperationToClick { get; set; }
@@ -59,12 +69,24 @@ namespace SmaDesktopTerminal.Classes.Interface
                 return instruments;
             }
             set
-                {
+            {
                 instruments = value;
                 OnPropertyChanged();
             }
 
         }
+
+
+        public Instrument SelectedInstrument
+        {
+            get => selectedInstrument;
+            set
+            {
+                selectedInstrument = value;
+                OnPropertyChanged();
+            }
+        }
+
 
         public OperationUserController(ObservableCollection<Instrument> instruments)
         {
@@ -82,9 +104,9 @@ namespace SmaDesktopTerminal.Classes.Interface
 
     public class BuyOperationToClick : ICommand
     {
-        private Action<string> execute;
+        private Action execute;
 
-        public BuyOperationToClick(Action<string> action)
+        public BuyOperationToClick(Action action)
         {
             execute = action;
         }
@@ -98,19 +120,19 @@ namespace SmaDesktopTerminal.Classes.Interface
 
         public void Execute(object parameter)
         {
-            execute("buy");
+            execute();
         }
     }
 
     public class SellOperationToClick : ICommand
     {
-        private Action<string> execute;
-        //private Func<object, bool> canExecute
+        private Action execute;
+
 
         public event EventHandler CanExecuteChanged;
 
 
-        public SellOperationToClick(Action<string> action)
+        public SellOperationToClick(Action action)
         {
             execute = action;
         }
@@ -123,7 +145,7 @@ namespace SmaDesktopTerminal.Classes.Interface
 
         public void Execute(object parameter)
         {
-            execute("sell");
+            execute();
         }
     }
 }

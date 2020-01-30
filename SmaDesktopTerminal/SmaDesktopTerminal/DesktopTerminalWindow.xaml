@@ -8,10 +8,29 @@
         xmlns:tm="clr-namespace:SmaDesktopTerminal.Models"
         xmlns:oxy="http://oxyplot.org/wpf"
         xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
+        xmlns:sys="clr-namespace:System;assembly=mscorlib"
 
         mc:Ignorable="d"
         Title="Desktop Терминал" Height="600" Width="1024" Style="{DynamicResource WindowStyle}"
         Loaded="Window_Loaded">
+
+    <Window.Resources>
+        <Style x:Key="resizedCalendarItem" TargetType="{x:Type Calendar}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Calendar}">
+                        <Viewbox Height="250"
+                                 Width="250">
+                            <CalendarItem x:Name="PART_CalendarItem"
+                                          BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}"
+                                          BorderBrush="{TemplateBinding BorderBrush}" />
+                        </Viewbox>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
 
     <Grid x:Name="terminalMainGrid" Style="{DynamicResource MainGridStyle}" >
         <Grid.RowDefinitions>
@@ -185,11 +204,16 @@
 
                     <Grid Column="1" Style="{DynamicResource MainGridStyle }">
                         <Grid.RowDefinitions>
-                            <RowDefinition></RowDefinition>
-                            <RowDefinition></RowDefinition>
+                            <RowDefinition Height="290"></RowDefinition>
+                            <RowDefinition Height="1*"></RowDefinition>
                         </Grid.RowDefinitions>
 
                         <Grid Row="0" >
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="400"></ColumnDefinition>
+                                <ColumnDefinition Width="1*"></ColumnDefinition>
+                            </Grid.ColumnDefinitions>
+
                             <UserControl Name="OperationUserControl" Margin="10,10,2,10" BorderBrush="Black" BorderThickness="1" Padding="5" DataContext="{Binding OperationUserControllerInst}"  >
                                 <Grid>
                                     <Grid.RowDefinitions>
@@ -204,13 +228,14 @@
                                             <ColumnDefinition Width="35"></ColumnDefinition>
                                             <ColumnDefinition Width="8"></ColumnDefinition>
                                         </Grid.ColumnDefinitions>
-                                        <TextBlock VerticalAlignment="Center" Margin="10,8,0,7" Style="{DynamicResource MaiTextBlockStyle}" Height="20">Добавление операции</TextBlock>
+                                        <TextBlock VerticalAlignment="Center" Margin="10,0,0,0" Style="{DynamicResource MaiTextBlockStyle}" Height="20">Добавление операции</TextBlock>
                                         <Line Stretch="Fill" VerticalAlignment="Bottom" X2="1" Fill="Black" HorizontalAlignment="Stretch" Grid.Column="0" Grid.ColumnSpan="6" Margin="5,0" StrokeThickness="1"  Stroke="Black" Height="1"/>
                                     </Grid>
                                     <Grid Row="1">
                                         <Grid.RowDefinitions>
                                             <RowDefinition Height="50"></RowDefinition>
                                             <RowDefinition Height="60"></RowDefinition>
+                                            <RowDefinition Height="40"></RowDefinition>
                                             <RowDefinition></RowDefinition>
                                         </Grid.RowDefinitions>
                                         <Grid Row="0" Margin="0,5,0,0" >
@@ -219,7 +244,7 @@
                                                 <ColumnDefinition/>
                                             </Grid.ColumnDefinitions>
                                             <TextBlock HorizontalAlignment="Right" VerticalAlignment="Center" Style="{DynamicResource MaiTextBlockStyle}" Width="43" Height="26" Margin="0,10,10,9" >Актив:</TextBlock>
-                                            <ComboBox Grid.Column="1" SelectedIndex="0" VerticalAlignment="Center" HorizontalAlignment="Left" Width="200" Height="26" DataContext="{Binding Instruments}" ItemsSource="{Binding Name}" Margin="0,10,0,9" ></ComboBox>
+                                            <ComboBox Grid.Column="1" SelectedIndex="0" VerticalAlignment="Center" HorizontalAlignment="Left" Width="200" Height="26" ItemsSource="{Binding Instruments}" DisplayMemberPath="Name" Margin="0,10,0,9" SelectedItem="{Binding SelectedInstrument, Mode=TwoWay}" ></ComboBox>
                                         </Grid>
                                         <Grid Row="1">
                                             <Grid.ColumnDefinitions>
@@ -228,22 +253,142 @@
                                             </Grid.ColumnDefinitions>
                                             <StackPanel Grid.Column="0"  Orientation="Vertical" Margin="10,0,10,0">
                                                 <TextBlock Margin="10,5" Style="{DynamicResource MaiTextBlockStyle}">Цена:</TextBlock>
-                                                <TextBox  Background="Transparent" Text="{Binding OperationPrice}"></TextBox>
+                                                <TextBox  Background="Transparent" Text="{Binding OperationPrice}" Style="{DynamicResource TextBoxStyle}"></TextBox>
                                             </StackPanel>
                                             <StackPanel Grid.Column="1" Orientation="Vertical" Margin="10,0,10,0">
                                                 <TextBlock Margin="10,5" Style="{DynamicResource MaiTextBlockStyle}" >Количество:</TextBlock>
-                                                <TextBox  Background="Transparent" Text="{Binding Count}"></TextBox>
+                                                <TextBox  Background="Transparent" Text="{Binding Count}" Style="{DynamicResource TextBoxStyle}"></TextBox>
                                             </StackPanel>
 
                                         </Grid>
                                         <Grid Row="2">
+                                            <StackPanel Orientation="Horizontal"  Margin="10,5,10,5">
+                                                <TextBlock Height="25" Width="52" Margin="10,2,0,2" Style="{DynamicResource MaiTextBlockStyle}">Дата:</TextBlock>
+                                                <TextBox Width="200" Background="Transparent"  Style="{DynamicResource TextBoxStyle}" Text="{Binding Date,  StringFormat='yyyy-MM-dd HH:mm:ss',Mode=TwoWay}"/>
+                                            </StackPanel>
+                                        </Grid>
+                                        <Grid Row="3">
                                             <Grid.ColumnDefinitions>
                                                 <ColumnDefinition></ColumnDefinition>
                                                 <ColumnDefinition></ColumnDefinition>
                                             </Grid.ColumnDefinitions>
-                                            <Button Grid.Column="0" Width="120" Height="50" Command="{Binding BuyOperationToClick}">Покупка</Button>
+                                            <Button Grid.Column="0" Width="120" Height="50" Command="{Binding  BuyOperationToClick}">Покупка</Button>
                                             <Button Grid.Column="1" Width="120" Height="50" Command="{Binding SellOperationToClick}">Продажа</Button>
                                         </Grid>
+                                    </Grid>
+
+                                </Grid>
+
+                            </UserControl>
+
+                        </Grid>
+                        <Grid Row="1" >
+                            <UserControl Name="OperationHistoryControl" Margin="10,0,2,10" BorderBrush="Black" BorderThickness="1" Padding="5" DataContext="{Binding OperationHistoryControllerInst}"  >
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="35"></RowDefinition>
+                                        <RowDefinition></RowDefinition>
+                                    </Grid.RowDefinitions>
+                                    <Grid Row="0">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="160"></ColumnDefinition>
+                                            <ColumnDefinition Width="100"></ColumnDefinition>
+                                            <ColumnDefinition/>
+                                            <ColumnDefinition Width="35"></ColumnDefinition>
+                                            <ColumnDefinition Width="35"></ColumnDefinition>
+                                            <ColumnDefinition Width="8"></ColumnDefinition>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock VerticalAlignment="Center" Margin="10,8,0,7" Style="{DynamicResource MaiTextBlockStyle}" Height="20">История операций</TextBlock>
+                                        <windows:CircularProgressBar x:Name="OperationsHistoryProgressBar" Grid.Column="3" HorizontalAlignment="Center" Visibility="{Binding PortfolioProgressBarVisibility}" Height="Auto" />
+                                        <Button Name="OperationsHistoryUpdateBtn" Grid.Column="4"  Command="{Binding UpdateHistoryCommand}"  Margin="3"  Style="{DynamicResource ButtonUpdateStyle}" />
+                                        <Line Stretch="Fill" VerticalAlignment="Bottom" X2="1" Fill="Black" HorizontalAlignment="Stretch" Grid.Column="0" Grid.ColumnSpan="6" Margin="5,0" StrokeThickness="1"  Stroke="Black" Height="1"/>
+                                    </Grid>
+
+                                    <Grid Row="1">
+                                        <ListView Name="OperationsHistoryView" ItemsSource="{Binding Operations}" SelectionMode="Single" SelectedItem="{Binding SelectedOperationItem , Mode=TwoWay}" SelectionChanged="OperationsHistoryView_OnSelectionChanged" Background="Transparent" SizeChanged="ListView_SizeChanged" ItemContainerStyle="{DynamicResource ListViewItemStyle}" Margin="0,5,0,0" BorderThickness="0" >
+                                            <ListView.View>
+                                                <GridView >
+                                                    <GridViewColumn Width="100" >
+                                                        <GridViewColumnHeader HorizontalContentAlignment="Stretch"  Background="Transparent" >
+                                                            <TextBlock HorizontalAlignment="Stretch" Style="{DynamicResource MaiTextBlockStyle}" Width="auto">Операция</TextBlock>
+                                                        </GridViewColumnHeader>
+                                                        <GridViewColumn.CellTemplate>
+                                                            <DataTemplate>
+                                                                <Grid Background="Transparent">
+                                                                    <Grid.ColumnDefinitions >
+                                                                        <ColumnDefinition Width="*" ></ColumnDefinition>
+                                                                    </Grid.ColumnDefinitions>
+                                                                    <TextBlock Grid.Column="0" Text="{Binding OperationTypeStr}" Style="{DynamicResource MaiTextBlockStyle}"/>
+                                                                </Grid>
+                                                            </DataTemplate>
+                                                        </GridViewColumn.CellTemplate>
+                                                    </GridViewColumn>
+
+                                                    <GridViewColumn  Width="130">
+                                                        <GridViewColumnHeader HorizontalContentAlignment="Stretch"  Background="Transparent" >
+                                                            <TextBlock HorizontalAlignment="Stretch" Style="{DynamicResource MaiTextBlockStyle}" Width="auto">Название</TextBlock>
+                                                        </GridViewColumnHeader>
+                                                        <GridViewColumn.CellTemplate>
+                                                            <DataTemplate>
+                                                                <Grid Background="Transparent">
+                                                                    <Grid.ColumnDefinitions >
+                                                                        <ColumnDefinition Width="*" ></ColumnDefinition>
+                                                                    </Grid.ColumnDefinitions>
+                                                                    <TextBlock Grid.Column="0" Text="{Binding InstrumentName}" Style="{DynamicResource MaiTextBlockStyle}"/>
+                                                                </Grid>
+                                                            </DataTemplate>
+                                                        </GridViewColumn.CellTemplate>
+                                                    </GridViewColumn>
+                                                    <GridViewColumn  Width="70">
+                                                        <GridViewColumnHeader HorizontalContentAlignment="Stretch"  Background="Transparent" >
+                                                            <TextBlock HorizontalAlignment="Stretch" Style="{DynamicResource MaiTextBlockStyle}" Width="auto">Кол-во</TextBlock>
+                                                        </GridViewColumnHeader>
+                                                        <GridViewColumn.CellTemplate>
+                                                            <DataTemplate>
+                                                                <Grid Background="Transparent">
+                                                                    <Grid.ColumnDefinitions >
+                                                                        <ColumnDefinition Width="*" ></ColumnDefinition>
+                                                                    </Grid.ColumnDefinitions>
+                                                                    <TextBlock Grid.Column="0" Text="{Binding Count}" Style="{DynamicResource MaiTextBlockStyle}"/>
+                                                                </Grid>
+                                                            </DataTemplate>
+                                                        </GridViewColumn.CellTemplate>
+                                                    </GridViewColumn>
+                                                    <GridViewColumn Width="50">
+                                                        <GridViewColumnHeader HorizontalContentAlignment="Stretch"  Background="Transparent" >
+                                                            <TextBlock HorizontalAlignment="Stretch" Style="{DynamicResource MaiTextBlockStyle}" Width="auto">Цена</TextBlock>
+                                                        </GridViewColumnHeader>
+                                                        <GridViewColumn.CellTemplate>
+                                                            <DataTemplate>
+                                                                <Grid Background="Transparent">
+                                                                    <Grid.ColumnDefinitions >
+                                                                        <ColumnDefinition Width="*" ></ColumnDefinition>
+                                                                    </Grid.ColumnDefinitions>
+                                                                    <TextBlock Grid.Column="0" Text="{Binding Price}" Style="{DynamicResource MaiTextBlockStyle}"/>
+                                                                </Grid>
+                                                            </DataTemplate>
+                                                        </GridViewColumn.CellTemplate>
+                                                    </GridViewColumn>
+                                                    <GridViewColumn Width="70">
+                                                        <GridViewColumnHeader HorizontalContentAlignment="Stretch"  Background="Transparent" >
+                                                            <TextBlock HorizontalAlignment="Stretch" Style="{DynamicResource MaiTextBlockStyle}" Width="70">Дата</TextBlock>
+                                                        </GridViewColumnHeader>
+                                                        <GridViewColumn.CellTemplate>
+                                                            <DataTemplate>
+                                                                <Grid Background="Transparent">
+                                                                    <Grid.ColumnDefinitions >
+                                                                        <ColumnDefinition Width="*" ></ColumnDefinition>
+                                                                    </Grid.ColumnDefinitions>
+                                                                    <TextBlock Grid.Column="0" Text="{Binding Date}" Style="{DynamicResource MaiTextBlockStyle}"/>
+                                                                </Grid>
+                                                            </DataTemplate>
+                                                        </GridViewColumn.CellTemplate>
+                                                    </GridViewColumn>
+
+                                                </GridView>
+                                            </ListView.View>
+                                        </ListView>
+
                                     </Grid>
 
                                 </Grid>
@@ -384,16 +529,16 @@
                                         </Grid.RowDefinitions>
                                         <TextBlock Grid.Column="0" Grid.Row="0" Margin="5,5,0,5" HorizontalAlignment="Left" Width="66" Style="{DynamicResource MaiTextBlockStyle}">Название</TextBlock>
                                         <TextBlock Grid.Column="1" Grid.Row="0" Margin="0,5,5,5" HorizontalAlignment="Right" Text="{Binding SelectedInstrument.Name}" TextWrapping="Wrap"  Style="{DynamicResource MaiTextBlockStyle}"></TextBlock>
-                                        <TextBlock Grid.Column="0" Grid.Row="1" Margin="5,5,0,5" HorizontalAlignment="Left" Width="67" Style="{DynamicResource MaiTextBlockStyle}">Открытие</TextBlock>
-                                        <TextBlock Grid.Column="1" Grid.Row="1" Margin="0,5,5,5" HorizontalAlignment="Right" Text="{Binding Open}" Width="0" Style="{DynamicResource MaiTextBlockStyle}"></TextBlock>
+                                        <TextBlock Grid.Column="0" Grid.Row="1" Margin="5,5,0,5" HorizontalAlignment="Left" Width="67"  Style="{DynamicResource MaiTextBlockStyle}">Открытие</TextBlock>
+                                        <TextBlock Grid.Column="1" Grid.Row="1" Margin="0,5,5,5" HorizontalAlignment="Right" DataContext="{Binding LastSelInstrumentCandle}" Text="{Binding Open}"  Style="{DynamicResource MaiTextBlockStyle}"></TextBlock>
                                         <TextBlock Grid.Column="0" Grid.Row="2" Margin="5,5,0,5" HorizontalAlignment="Left" Width="39" Style="{DynamicResource MaiTextBlockStyle}">Макс.</TextBlock>
-                                        <TextBlock Grid.Column="1" Grid.Row="2" Margin="0,5,5,5" HorizontalAlignment="Right" Text="{Binding High}" Width="0" Style="{DynamicResource MaiTextBlockStyle}"></TextBlock>
+                                        <TextBlock Grid.Column="1" Grid.Row="2" Margin="0,5,5,5" HorizontalAlignment="Right" DataContext="{Binding LastSelInstrumentCandle}" Text="{Binding High}"  Style="{DynamicResource MaiTextBlockStyle}"></TextBlock>
                                         <TextBlock Grid.Column="0" Grid.Row="3" Margin="5,5,0,5" HorizontalAlignment="Left" Width="34" Style="{DynamicResource MaiTextBlockStyle}">Мин.</TextBlock>
-                                        <TextBlock Grid.Column="1" Grid.Row="3" Margin="0,5,5,5" HorizontalAlignment="Right" Text="{Binding Low}" Width="0" Style="{DynamicResource MaiTextBlockStyle}"></TextBlock>
+                                        <TextBlock Grid.Column="1" Grid.Row="3" Margin="0,5,5,5" HorizontalAlignment="Right" DataContext="{Binding LastSelInstrumentCandle}" Text="{Binding Low}"  Style="{DynamicResource MaiTextBlockStyle}"></TextBlock>
                                         <TextBlock Grid.Column="0" Grid.Row="4" Margin="5,5,0,5" HorizontalAlignment="Left" Width="65" Style="{DynamicResource MaiTextBlockStyle}">Закрытие</TextBlock>
-                                        <TextBlock Grid.Column="1" Grid.Row="4" Margin="0,5,5,5" HorizontalAlignment="Right" Text="{Binding Close}" Width="0" Style="{DynamicResource MaiTextBlockStyle}"></TextBlock>
+                                        <TextBlock Grid.Column="1" Grid.Row="4" Margin="0,5,5,5" HorizontalAlignment="Right" DataContext="{Binding LastSelInstrumentCandle}" Text="{Binding Close}"  Style="{DynamicResource MaiTextBlockStyle}"></TextBlock>
                                         <TextBlock Grid.Column="0" Grid.Row="5" Margin="5,5,0,5" HorizontalAlignment="Left" Width="32" Style="{DynamicResource MaiTextBlockStyle}">Дата</TextBlock>
-                                        <TextBlock Grid.Column="1" Grid.Row="5" Margin="0,5,5,5" HorizontalAlignment="Right" Text="{Binding Date}" Width="0" Style="{DynamicResource MaiTextBlockStyle}"></TextBlock>
+                                        <TextBlock Grid.Column="1" Grid.Row="5" Margin="0,5,5,5" HorizontalAlignment="Right" Grid.ColumnSpan="1" DataContext="{Binding LastSelInstrumentCandle}" Text="{Binding Date,  StringFormat='dd.MM.yyyy HH:mm'}"  Style="{DynamicResource MaiTextBlockStyle}"></TextBlock>
                                     </Grid>
                                 </GroupBox>
                             </UserControl>

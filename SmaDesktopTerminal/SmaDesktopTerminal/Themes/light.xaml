@@ -106,4 +106,10 @@
     </Style>
 
 
+    <Style x:Key="TextBoxStyle" TargetType="TextBox">
+        <Setter Property="Foreground" Value="Black" />
+        <Setter Property="BorderBrush" Value="#4d5862" />
+    </Style>
+
+
 </ResourceDictionary>

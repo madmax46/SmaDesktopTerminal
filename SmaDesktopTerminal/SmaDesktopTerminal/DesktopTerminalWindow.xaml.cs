@@ -160,5 +160,10 @@ namespace SmaDesktopTerminal
         {
             //throw new NotImplementedException();
         }
+
+        private void OperationsHistoryView_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            
+        }
     }
 }

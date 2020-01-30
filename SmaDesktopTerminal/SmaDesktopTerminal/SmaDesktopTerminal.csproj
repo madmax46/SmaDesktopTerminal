@@ -61,6 +61,7 @@
     </ApplicationDefinition>
     <Compile Include="Classes\Analytics\ConsolidateInstrumentsAnalysis.cs" />
     <Compile Include="Classes\Analytics\InstrumentsAnalysisInfo.cs" />
+    <Compile Include="Classes\Interface\OperationsHistoryUserController.cs" />
     <Compile Include="Classes\Interface\OperationUserController.cs" />
     <Compile Include="Classes\Interface\PortfolioUserController.cs" />
     <Compile Include="Classes\Person.cs" />

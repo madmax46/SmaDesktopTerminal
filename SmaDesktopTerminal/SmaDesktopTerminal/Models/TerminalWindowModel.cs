@@ -24,6 +24,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
 using ExchCommonLib.Classes;
+using ExchCommonLib.Classes.Operations;
 using ExchCommonLib.Classes.UserPortfolio;
 using ExchCommonLib.Enums;
 using SmaDesktopTerminal.Classes.Analytics;
@@ -63,6 +64,8 @@ namespace SmaDesktopTerminal.Models
         private string selectedIntervalForAnalysis;
         private PortfolioUserController portfolioUserController;
         private OperationUserController operationUserControllerInst;
+        private OperationsHistoryUserController operationHistoryControllerInst;
+        private Candle lastSelInstrumentCandle;
 
         public Person CurPerson
         {
@@ -309,6 +312,26 @@ namespace SmaDesktopTerminal.Models
             }
         }
 
+        public OperationsHistoryUserController OperationHistoryControllerInst
+        {
+            get => operationHistoryControllerInst;
+            set
+            {
+                operationHistoryControllerInst = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public Candle LastSelInstrumentCandle
+        {
+            get => lastSelInstrumentCandle;
+            set
+            {
+                lastSelInstrumentCandle = value;
+                OnPropertyChanged();
+            }
+        }
+
         public TerminalWindowModel(AppMainModel mainModel)
         {
             this.mainModel = mainModel;
@@ -329,16 +352,17 @@ namespace SmaDesktopTerminal.Models
             InstrumentsProgressBarVisibility = Visibility.Hidden;
             ChartProgressBarVisibility = Visibility.Hidden;
 
-            OperationUserControllerInst = new OperationUserController(Instruments);
-            OperationUserControllerInst.BuyOperationToClick = new BuyOperationToClick(new Action<string>((r) =>
+            OperationUserControllerInst = new OperationUserController(Instruments)
             {
+                BuyOperationToClick = new BuyOperationToClick(AddBuyOperation),
+                SellOperationToClick = new SellOperationToClick(AddSellOperation),
+                Date = DateTime.Now
+            };
 
-            }));
-
-            OperationUserControllerInst.SellOperationToClick = new SellOperationToClick(new Action<string>((r) =>
-             {
-
-             }));
+            OperationHistoryControllerInst = new OperationsHistoryUserController()
+            {
+                PortfolioProgressBarVisibility = Visibility.Hidden
+            };
 
             desktopTerminalWindow = new DesktopTerminalWindow(this);
             desktopTerminalWindow.Show();
@@ -365,10 +389,16 @@ namespace SmaDesktopTerminal.Models
 
         public void WindowLoaded()
         {
-            ReloadUserPortfolioAsync();
+            ReloadPortfolioTab();
             ReloadParsedInstrumentsAsync();
         }
 
+
+        public void ReloadPortfolioTab()
+        {
+            ReloadUserPortfolioAsync();
+            ReloadUserOperationsHistoryAsync();
+        }
 
         public async void ReloadUserPortfolioAsync()
         {
@@ -380,7 +410,7 @@ namespace SmaDesktopTerminal.Models
                 };
 
                 var res = await CallRest.GetAsync<Portfolio>(
-                    $"{urlToService}api/v1/portfolio/GetPortfolio", httpClientService);
+                    $"{urlToService}api/v1/portfolio/get", httpClientService);
 
                 if (res?.Response == null)
                     return;
@@ -402,7 +432,37 @@ namespace SmaDesktopTerminal.Models
             }
         }
 
+        public async void ReloadUserOperationsHistoryAsync()
+        {
+            try
+            {
+                OperationHistoryControllerInst = new OperationsHistoryUserController()
+                {
+                    PortfolioProgressBarVisibility = Visibility.Visible,
+                    UpdateHistoryCommand = new ActionCommand(ReloadUserOperationsHistoryAsync)
+                };
 
+                var res = await CallRest.GetAsync<OperationsHistory>(
+                    $"{urlToService}api/v1/portfolio/operations/history", httpClientService);
+
+                if (res?.Response == null)
+                    return;
+
+                if (res?.Response?.Operations?.Any() == true)
+                {
+                    res.Response.Operations.ForEach(r => OperationHistoryControllerInst.Operations.Add(r));
+                }
+            }
+            catch (Exception e)
+            {
+
+
+            }
+            finally
+            {
+                OperationHistoryControllerInst.PortfolioProgressBarVisibility = Visibility.Hidden;
+            }
+        }
 
         public async void ReloadParsedInstrumentsAsync()
         {
@@ -428,63 +488,7 @@ namespace SmaDesktopTerminal.Models
                 InstrumentsProgressBarVisibility = Visibility.Hidden;
             }
         }
-
-
-        public void ReloadCandles()
-        {
-            try
-            {
-                VolumeStyle volumeStyle = VolumeStyle.Combined;
-                var series = new CandleStickAndVolumeSeries
-                {
-                    PositiveColor = OxyColors.DarkGreen,
-                    NegativeColor = OxyColors.Red,
-                    PositiveHollow = false,
-                    NegativeHollow = false,
-                    SeparatorColor = OxyColors.Gray,
-                    SeparatorLineStyle = LineStyle.Dash,
-                    VolumeStyle = volumeStyle,
-                    //StrokeThickness = 3
-                };
-
-
-                series.Append(new OhlcvItem(1, 3, 5, 1, 4));
-                series.Append(new OhlcvItem(2, 4, 5, 1, 3));
-                Random random = new Random();
-                for (int i = 3; i < 20; i++)
-                {
-                    var item = random.Next(1, i);
-                    var item2 = random.Next(1, i);
-                    var item3 = random.Next(1, i);
-                    var item4 = random.Next(1, i);
-
-                    series.Append(new OhlcvItem(i, item, item3, item4, item2));
-                }
-
-                //desktopTerminalWindow.oxyPlotView.InvalidatePlot(true);
-                PlotModel plotModel = new PlotModel();
-                //CandlesChart.Series.Add(series);
-                plotModel.Series.Add(series);
-                CandlesChart = plotModel;
-
-            }
-            catch (Exception ex)
-            {
-
-            }
-        }
-
-
-        public void InstrumentSelectionChanged()
-        {
-            ReloadCandlesForChart();
-            ReloadInstrumentAnalysis();
-        }
         public void ChartRefresh()
-        {
-            ReloadCandlesForChart();
-        }
-        public void InstrumentIntervalChanged()
         {
             ReloadCandlesForChart();
         }
@@ -518,6 +522,7 @@ namespace SmaDesktopTerminal.Models
 
                     if (res?.Response?.Candles?.Any() == true)
                     {
+                        LastSelInstrumentCandle = res.Response.LastCandle;
                         FillPlotByNewData(res.Response);
                     }
 
@@ -529,9 +534,6 @@ namespace SmaDesktopTerminal.Models
                 {
                     ChartProgressBarVisibility = Visibility.Hidden;
                 }
-
-
-                ///api/v{version}/market/candles
             }
             catch (Exception ex)
             {
@@ -581,13 +583,6 @@ namespace SmaDesktopTerminal.Models
                     dict.TryGetValue(3, out var mlMethods);
                     MlAnalysisInfo = new InstrumentsAnalysisInfo(mlMethods);
 
-
-                    //if (res?.Response?.Candles?.Any() == true)
-                    //{
-                    //    FillPlotByNewData(res.Response);
-                    //}
-
-                    desktopTerminalWindow.ChartProgressBar.Visibility = System.Windows.Visibility.Hidden;
                 }
                 catch (Exception ex)
                 {
@@ -603,6 +598,18 @@ namespace SmaDesktopTerminal.Models
             catch (Exception ex)
             {
             }
+        }
+
+
+
+        public void InstrumentSelectionChanged()
+        {
+            ReloadCandlesForChart();
+            ReloadInstrumentAnalysis();
+        }
+        public void InstrumentIntervalChanged()
+        {
+            ReloadCandlesForChart();
         }
 
 
@@ -738,6 +745,46 @@ namespace SmaDesktopTerminal.Models
             }
         }
 
+
+        private void AddBuyOperation()
+        {
+            SaveOperation(OperationType.Buy);
+        }
+
+        private void AddSellOperation()
+        {
+            SaveOperation(OperationType.Sell);
+
+        }
+
+        private async void SaveOperation(OperationType operationType)
+        {
+
+            try
+            {
+
+
+                var marketOperation = new MarketOperation();
+                marketOperation.Count = (int)OperationUserControllerInst.Count;
+                marketOperation.InstrumentId = (uint)OperationUserControllerInst.SelectedInstrument.FinamEmitentIDInt;
+                marketOperation.Price = OperationUserControllerInst.OperationPrice;
+                marketOperation.OrderType = operationType;
+                marketOperation.Date = OperationUserControllerInst.Date;
+
+                var res = await CallRest.PostAsync<MarketOperation, string>(
+                    $"{urlToService}api/v1/portfolio/operations/save",
+                    marketOperation, httpClientService);
+
+            }
+            catch (Exception e)
+            {
+
+            }
+            finally
+            {
+                ReloadPortfolioTab();
+            }
+        }
 
         private void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
