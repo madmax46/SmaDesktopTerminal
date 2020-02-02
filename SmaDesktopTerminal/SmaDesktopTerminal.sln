@@ -11,6 +11,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "base", "base", "{4FAB31CB-9
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Interface", "Interface", "{73478A44-8083-451A-B261-47784722C768}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AuthCommonLib", "..\..\CommonProjects\CommonProjects\AuthCommonLib\AuthCommonLib.csproj", "{9483B295-DB0C-4087-995F-12C03D914193}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -25,12 +27,17 @@ Global
 		{719EB4B6-C8CF-44B9-8C78-41CFBC148A58}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{719EB4B6-C8CF-44B9-8C78-41CFBC148A58}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{719EB4B6-C8CF-44B9-8C78-41CFBC148A58}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9483B295-DB0C-4087-995F-12C03D914193}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9483B295-DB0C-4087-995F-12C03D914193}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9483B295-DB0C-4087-995F-12C03D914193}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9483B295-DB0C-4087-995F-12C03D914193}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{719EB4B6-C8CF-44B9-8C78-41CFBC148A58} = {4FAB31CB-94DD-461C-86A6-CA7B16AEA29E}
+		{9483B295-DB0C-4087-995F-12C03D914193} = {4FAB31CB-94DD-461C-86A6-CA7B16AEA29E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {EFF8C2C5-D07C-4333-B468-F22A49E42AAA}

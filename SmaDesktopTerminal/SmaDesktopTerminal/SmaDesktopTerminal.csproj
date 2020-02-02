@@ -66,6 +66,7 @@
     <Compile Include="Classes\Interface\PortfolioUserController.cs" />
     <Compile Include="Classes\Person.cs" />
     <Compile Include="Classes\ServiceResponses\InstrumentsResponse.cs" />
+    <Compile Include="Models\LogInWindowModel.cs" />
     <Compile Include="Models\TerminalWindowModel.cs" />
     <Compile Include="Models\ThemesController.cs" />
     <Compile Include="Windows\CircularProgressBar.xaml.cs">
@@ -142,6 +143,10 @@
     </Resource>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\CommonProjects\CommonProjects\AuthCommonLib\AuthCommonLib.csproj">
+      <Project>{9483b295-db0c-4087-995f-12c03d914193}</Project>
+      <Name>AuthCommonLib</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\ExchangeAnalyticsSvcSharp\ExchangeAnalyticsService\ExchCommonLib\ExchCommonLib.csproj">
       <Project>{719EB4B6-C8CF-44B9-8C78-41CFBC148A58}</Project>
       <Name>ExchCommonLib</Name>
@@ -169,6 +174,8 @@
   <ItemGroup>
     <Resource Include="Terminal_23658.ico" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Classes\Auth\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

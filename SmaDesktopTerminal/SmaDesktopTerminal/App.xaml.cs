@@ -16,6 +16,7 @@ namespace SmaDesktopTerminal
     {
         public App()
         {
+
             AppMainModel terminalMainModel = new AppMainModel();
         }
 

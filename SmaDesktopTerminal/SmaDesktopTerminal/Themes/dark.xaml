@@ -3,7 +3,7 @@
                     xmlns:local="clr-namespace:ThemesApp">
 
     <Style x:Key="WindowStyle" TargetType="Window">
-        <Setter Property="Background" Value="Gray" />
+        <Setter Property="Background" Value="#25303a" />
         <Setter Property="FontSize" Value="15" />
     </Style>
 
@@ -107,6 +107,16 @@
     <Style x:Key="TextBoxStyle" TargetType="TextBox">
         <Setter Property="Foreground" Value="White" />
         <Setter Property="BorderBrush" Value="White" />
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="CaretBrush" Value="White"/>
+    </Style>
+
+
+    <Style x:Key="PasswordBoxStyle" TargetType="PasswordBox">
+        <Setter Property="Foreground" Value="White" />
+        <Setter Property="BorderBrush" Value="White" />
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="CaretBrush" Value="White"/>
     </Style>
 
 

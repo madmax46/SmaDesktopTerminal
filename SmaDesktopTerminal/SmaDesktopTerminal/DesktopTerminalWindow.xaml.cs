@@ -2,6 +2,7 @@
 using SmaDesktopTerminal.Models;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -163,7 +164,12 @@ namespace SmaDesktopTerminal
 
         private void OperationsHistoryView_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            
+
+        }
+
+        private void DesktopTerminalWindow_OnClosing(object sender, CancelEventArgs e)
+        {
+            windowModel.ShutDownApp();
         }
     }
 }

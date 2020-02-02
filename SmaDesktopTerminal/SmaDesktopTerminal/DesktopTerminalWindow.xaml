@@ -12,7 +12,9 @@
 
         mc:Ignorable="d"
         Title="Desktop Терминал" Height="600" Width="1024" Style="{DynamicResource WindowStyle}"
-        Loaded="Window_Loaded">
+        Loaded="Window_Loaded"
+        Closing="DesktopTerminalWindow_OnClosing"
+        WindowStartupLocation="CenterScreen">
 
     <Window.Resources>
         <Style x:Key="resizedCalendarItem" TargetType="{x:Type Calendar}">
@@ -178,7 +180,7 @@
                                                 </GridViewColumn>
                                                 <GridViewColumn  >
                                                     <GridViewColumnHeader HorizontalContentAlignment="Stretch"  Background="Transparent" >
-                                                        <TextBlock HorizontalAlignment="Stretch" Style="{DynamicResource MaiTextBlockStyle}" Width="auto">Аналитика</TextBlock>
+                                                        <TextBlock HorizontalAlignment="Stretch" Style="{DynamicResource MaiTextBlockStyle}" >Аналитика</TextBlock>
                                                     </GridViewColumnHeader>
                                                     <GridViewColumn.CellTemplate>
                                                         <DataTemplate>
@@ -186,7 +188,7 @@
                                                                 <Grid.ColumnDefinitions >
                                                                     <ColumnDefinition Width="*" ></ColumnDefinition>
                                                                 </Grid.ColumnDefinitions>
-                                                                <TextBlock Grid.Column="0" Text="{Binding Analytics}" Style="{DynamicResource MaiTextBlockStyle}"/>
+                                                                <TextBlock Grid.Column="0" Text="{Binding Analytics}" TextWrapping="Wrap" Style="{DynamicResource MaiTextBlockStyle}"/>
                                                             </Grid>
                                                         </DataTemplate>
                                                     </GridViewColumn.CellTemplate>
@@ -264,7 +266,7 @@
                                         <Grid Row="2">
                                             <StackPanel Orientation="Horizontal"  Margin="10,5,10,5">
                                                 <TextBlock Height="25" Width="52" Margin="10,2,0,2" Style="{DynamicResource MaiTextBlockStyle}">Дата:</TextBlock>
-                                                <TextBox Width="200" Background="Transparent"  Style="{DynamicResource TextBoxStyle}" Text="{Binding Date,  StringFormat='yyyy-MM-dd HH:mm:ss',Mode=TwoWay}"/>
+                                                <TextBox Width="200" Background="Transparent"  Style="{DynamicResource TextBoxStyle}" Text="{Binding Date,  StringFormat='HH:mm:ss MM-dd-yyyy',Mode=TwoWay}"/>
                                             </StackPanel>
                                         </Grid>
                                         <Grid Row="3">
@@ -308,7 +310,7 @@
                                         <ListView Name="OperationsHistoryView" ItemsSource="{Binding Operations}" SelectionMode="Single" SelectedItem="{Binding SelectedOperationItem , Mode=TwoWay}" SelectionChanged="OperationsHistoryView_OnSelectionChanged" Background="Transparent" SizeChanged="ListView_SizeChanged" ItemContainerStyle="{DynamicResource ListViewItemStyle}" Margin="0,5,0,0" BorderThickness="0" >
                                             <ListView.View>
                                                 <GridView >
-                                                    <GridViewColumn Width="100" >
+                                                    <GridViewColumn Width="80" >
                                                         <GridViewColumnHeader HorizontalContentAlignment="Stretch"  Background="Transparent" >
                                                             <TextBlock HorizontalAlignment="Stretch" Style="{DynamicResource MaiTextBlockStyle}" Width="auto">Операция</TextBlock>
                                                         </GridViewColumnHeader>
@@ -324,7 +326,7 @@
                                                         </GridViewColumn.CellTemplate>
                                                     </GridViewColumn>
 
-                                                    <GridViewColumn  Width="130">
+                                                    <GridViewColumn  Width="120">
                                                         <GridViewColumnHeader HorizontalContentAlignment="Stretch"  Background="Transparent" >
                                                             <TextBlock HorizontalAlignment="Stretch" Style="{DynamicResource MaiTextBlockStyle}" Width="auto">Название</TextBlock>
                                                         </GridViewColumnHeader>
@@ -339,7 +341,7 @@
                                                             </DataTemplate>
                                                         </GridViewColumn.CellTemplate>
                                                     </GridViewColumn>
-                                                    <GridViewColumn  Width="70">
+                                                    <GridViewColumn  Width="55">
                                                         <GridViewColumnHeader HorizontalContentAlignment="Stretch"  Background="Transparent" >
                                                             <TextBlock HorizontalAlignment="Stretch" Style="{DynamicResource MaiTextBlockStyle}" Width="auto">Кол-во</TextBlock>
                                                         </GridViewColumnHeader>
@@ -379,7 +381,7 @@
                                                                     <Grid.ColumnDefinitions >
                                                                         <ColumnDefinition Width="*" ></ColumnDefinition>
                                                                     </Grid.ColumnDefinitions>
-                                                                    <TextBlock Grid.Column="0" Text="{Binding Date}" Style="{DynamicResource MaiTextBlockStyle}"/>
+                                                                    <TextBlock Grid.Column="0" Text="{Binding Date,  StringFormat='HH:mm:ss MM-dd-yyyy'}" TextWrapping="WrapWithOverflow" Style="{DynamicResource MaiTextBlockStyle}"/>
                                                                 </Grid>
                                                             </DataTemplate>
                                                         </GridViewColumn.CellTemplate>

@@ -150,7 +150,23 @@ namespace SmaDesktopTerminal.Models
 
         internal void LogOut()
         {
-            //throw new NotImplementedException();
+            desktopTerminalWindow.Hide();
+            CurPerson = null;
+            Instruments.Clear();
+            SelectedInstrument = null;
+            ChartIntervals.Clear();
+            SeriesCollection = null;
+            SeriesVolumeCollection = null;
+            MovingAveragesInfo = null;
+            OscillatorsInfo = null;
+            MlAnalysisInfo = null;
+            PortfolioUserControllerInst = null;
+            OperationUserControllerInst = null;
+            OperationHistoryControllerInst = null;
+            LastSelInstrumentCandle = null;
+
+            ThemesController.ApplyLightTheme();
+            mainModel.TerminalLogOut();
         }
 
         public SeriesCollection SeriesCollection
@@ -332,15 +348,16 @@ namespace SmaDesktopTerminal.Models
             }
         }
 
-        public TerminalWindowModel(AppMainModel mainModel)
+        public TerminalWindowModel(AppMainModel mainModel, Person person)
         {
             this.mainModel = mainModel;
-            var authToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoibWFkbWF4IiwiaHR0cDovL3NjaGVtYXMubWljcm9zb2Z0LmNvbS93cy8yMDA4LzA2L2lkZW50aXR5L2NsYWltcy9yb2xlIjoiYWRtaW4iLCJpc3MiOiJTbWFBdXRoU2VydmljZSIsImF1ZCI6Imh0dHA6Ly9sb2NhbGhvc3QvIn0.h5yBoP5P0GFuR-E2pv4fF-A1FQXcIy2HB_dvJ1vycA8";
+            //var authToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoibWFkbWF4IiwiaHR0cDovL3NjaGVtYXMubWljcm9zb2Z0LmNvbS93cy8yMDA4LzA2L2lkZW50aXR5L2NsYWltcy9yb2xlIjoiYWRtaW4iLCJVc2VySWQiOiIxIiwiRmlyc3ROYW1lIjoi0JzQsNC60YHQuNC8IiwiU2Vjb25kTmFtZSI6ItCT0LvRg9GI0LDQutC-0LIiLCJFbWFpbCI6ImdsdXNoYWtvdm1heEBtYWlsLnJ1IiwiaXNzIjoiU21hQXV0aFNlcnZpY2UiLCJhdWQiOiJodHRwOi8vbG9jYWxob3N0LyJ9.tGKQu2877h_8axW8LtOmCpZ_DZRThEsXyNmj269BS9g";
             urlToService = "http://localhost:4000/";
 
+
             httpClientService = new HttpClient();
-            httpClientService.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", authToken);
-            CurPerson = mainModel.CurPerson;
+            httpClientService.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", person.AuthToken);
+            CurPerson = person;
             Instruments = new ObservableCollection<Instrument>();
             CandlesChart = new PlotModel();
 
@@ -428,7 +445,8 @@ namespace SmaDesktopTerminal.Models
             }
             finally
             {
-                PortfolioUserControllerInst.PortfolioProgressBarVisibility = Visibility.Hidden;
+                if (PortfolioUserControllerInst?.PortfolioProgressBarVisibility != null)
+                    PortfolioUserControllerInst.PortfolioProgressBarVisibility = Visibility.Hidden;
             }
         }
 
@@ -460,7 +478,8 @@ namespace SmaDesktopTerminal.Models
             }
             finally
             {
-                OperationHistoryControllerInst.PortfolioProgressBarVisibility = Visibility.Hidden;
+                if (OperationHistoryControllerInst?.PortfolioProgressBarVisibility != null)
+                    OperationHistoryControllerInst.PortfolioProgressBarVisibility = Visibility.Hidden;
             }
         }
 
@@ -789,6 +808,11 @@ namespace SmaDesktopTerminal.Models
         private void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        public void ShutDownApp()
+        {
+            mainModel.ShutDownApp();
         }
     }
 }

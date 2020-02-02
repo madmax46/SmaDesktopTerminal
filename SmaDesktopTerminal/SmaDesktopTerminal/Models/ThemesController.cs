@@ -13,8 +13,8 @@ namespace SmaDesktopTerminal.Models
         //private static string currentTheme = "light";
         static ThemesController()
         {
-            _urisToThemes.Add("dark", new Uri(@"Themes\dark.xaml", UriKind.Relative));
             _urisToThemes.Add("light", new Uri(@"Themes\light.xaml", UriKind.Relative));
+            _urisToThemes.Add("dark", new Uri(@"Themes\dark.xaml", UriKind.Relative));
         }
 
 
