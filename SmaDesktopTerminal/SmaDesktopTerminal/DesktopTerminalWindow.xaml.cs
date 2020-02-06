@@ -171,5 +171,15 @@ namespace SmaDesktopTerminal
         {
             windowModel.ShutDownApp();
         }
+
+        private void ChartTypesComboBox_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            windowModel.ChartRefresh();
+        }
+
+        private void ChartIndicatorComboBox_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+
+        }
     }
 }

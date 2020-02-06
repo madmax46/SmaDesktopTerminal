@@ -89,10 +89,6 @@ namespace SmaDesktopTerminal.Models
         {
             try
             {
-                //PortfolioUserControllerInst = new PortfolioUserController
-                //{
-                //    PortfolioProgressBarVisibility = Visibility.Visible
-                //};
                 var hashPassword = PassUtils.GetMd5PassHash(logInWindow.PasswordBox.Password);
                 var request = new AuthenticateRequest()
                 {

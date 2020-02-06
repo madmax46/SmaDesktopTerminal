@@ -61,6 +61,7 @@
     </ApplicationDefinition>
     <Compile Include="Classes\Analytics\ConsolidateInstrumentsAnalysis.cs" />
     <Compile Include="Classes\Analytics\InstrumentsAnalysisInfo.cs" />
+    <Compile Include="Classes\Indicators\ChartIndicatorInfo.cs" />
     <Compile Include="Classes\Interface\OperationsHistoryUserController.cs" />
     <Compile Include="Classes\Interface\OperationUserController.cs" />
     <Compile Include="Classes\Interface\PortfolioUserController.cs" />
@@ -72,8 +73,14 @@
     <Compile Include="Windows\CircularProgressBar.xaml.cs">
       <DependentUpon>CircularProgressBar.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Windows\IndicatorsParams\MovingAverageParams.xaml.cs">
+      <DependentUpon>MovingAverageParams.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Windows\LogInWindow.xaml.cs">
       <DependentUpon>LogInWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\SettingsButton.xaml.cs">
+      <DependentUpon>SettingsButton.xaml</DependentUpon>
     </Compile>
     <Compile Include="Windows\SwitchCheckControl.xaml.cs">
       <DependentUpon>SwitchCheckControl.xaml</DependentUpon>
@@ -94,7 +101,15 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Windows\IndicatorsParams\MovingAverageParams.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Windows\LogInWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Windows\SettingsButton.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -147,20 +162,24 @@
       <Project>{9483b295-db0c-4087-995f-12c03d914193}</Project>
       <Name>AuthCommonLib</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\CommonProjects\CommonProjects\TechAnalysisAlgLib\TechAnalysisAlgLib.csproj">
+      <Project>{e44622e7-390d-45c5-ac06-aeaf7bb1b436}</Project>
+      <Name>TechAnalysisAlgLib</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\ExchangeAnalyticsSvcSharp\ExchangeAnalyticsService\ExchCommonLib\ExchCommonLib.csproj">
       <Project>{719EB4B6-C8CF-44B9-8C78-41CFBC148A58}</Project>
       <Name>ExchCommonLib</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="LiveCharts.Geared">
+      <Version>1.2.9</Version>
+    </PackageReference>
     <PackageReference Include="LiveCharts.Wpf">
       <Version>0.9.7</Version>
     </PackageReference>
     <PackageReference Include="Newtonsoft.Json">
       <Version>12.0.3</Version>
-    </PackageReference>
-    <PackageReference Include="OxyPlot.Wpf">
-      <Version>2.0.0</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
@@ -176,6 +195,14 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Classes\Auth\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\icons8-settings-32.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\icons8-synchronize-30.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

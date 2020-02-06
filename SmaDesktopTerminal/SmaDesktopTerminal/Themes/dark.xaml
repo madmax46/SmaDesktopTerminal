@@ -40,7 +40,7 @@
         </Setter>
         <Setter Property="Background">
             <Setter.Value>
-                <ImageBrush ImageSource="..\Resources\button_refresh_15001.ico"  />
+                <ImageBrush ImageSource="..\Resources\icons8-synchronize-30.png"  />
             </Setter.Value>
         </Setter>
         <Style.Triggers>
@@ -117,6 +117,28 @@
         <Setter Property="BorderBrush" Value="White" />
         <Setter Property="Background" Value="Transparent"/>
         <Setter Property="CaretBrush" Value="White"/>
+    </Style>
+
+
+    <Style  x:Key="ButtonIndicatorSettingsStyle" TargetType="{x:Type Button}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Button}">
+                    <Border Background="{TemplateBinding Background}" BorderBrush="Transparent">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="Background">
+            <Setter.Value>
+                <ImageBrush ImageSource="..\Resources\icons8-settings-32.png"  />
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+            </Trigger>
+        </Style.Triggers>
     </Style>
 
 

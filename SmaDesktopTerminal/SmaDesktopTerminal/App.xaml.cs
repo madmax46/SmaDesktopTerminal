@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using System.Windows;
+using Microsoft.Win32;
 using SmaDesktopTerminal.Models;
 
 namespace SmaDesktopTerminal
@@ -16,6 +18,11 @@ namespace SmaDesktopTerminal
     {
         public App()
         {
+            //RegistryKey registryKey = Registry.CurrentUser.OpenSubKey("SOFTWARE\\LiveCharts");
+
+            //ServicePointManager
+            //        .ServerCertificateValidationCallback +=
+            //    (sender, cert, chain, sslPolicyErrors) => true;
 
             AppMainModel terminalMainModel = new AppMainModel();
         }

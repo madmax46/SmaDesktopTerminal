@@ -5,15 +5,14 @@ using ExchCommonLib.Rest;
 using LiveCharts;
 using LiveCharts.Defaults;
 using LiveCharts.Wpf;
-using OxyPlot;
-using OxyPlot.Axes;
-using OxyPlot.Series;
+
 using SmaDesktopTerminal.Classes;
 using SmaDesktopTerminal.Classes.ServiceResponses;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Drawing;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -22,7 +21,9 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Input;
 using System.Windows.Threading;
+using ExchCommonLib.Analytics;
 using ExchCommonLib.Classes;
 using ExchCommonLib.Classes.Operations;
 using ExchCommonLib.Classes.UserPortfolio;
@@ -30,6 +31,12 @@ using ExchCommonLib.Enums;
 using SmaDesktopTerminal.Classes.Analytics;
 using SmaDesktopTerminal.Classes.Interface;
 using ColumnSeries = LiveCharts.Wpf.ColumnSeries;
+using LiveCharts.Geared;
+using LiveCharts.Definitions.Series;
+using SmaDesktopTerminal.Classes.Indicators;
+using TechAnalysisAlgLib.Indicators.MovingAverage;
+using TechAnalysisAlgLib.Indicators.Oscillators;
+using TechAnalysisAlgLib.Ml;
 
 namespace SmaDesktopTerminal.Models
 {
@@ -43,7 +50,6 @@ namespace SmaDesktopTerminal.Models
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        private PlotModel candlesChart;
         private ObservableCollection<Instrument> instruments;
 
         private Person person;
@@ -66,6 +72,16 @@ namespace SmaDesktopTerminal.Models
         private OperationUserController operationUserControllerInst;
         private OperationsHistoryUserController operationHistoryControllerInst;
         private Candle lastSelInstrumentCandle;
+        private string selectedChartType;
+        private List<string> chartTypes;
+        private readonly System.Windows.Media.BrushConverter brushConverter;
+        private CandlesResponse lastCandlesResponse;
+        private ObservableCollection<ChartIndicatorInfo> chartIndicators;
+        private Dictionary<string, string> availableChartIndicators;
+        private KeyValuePair<string, string> selectedAvailableChartIndicator;
+        private ICommand addIndicatorToChartCommand;
+        private SeriesCollection seriesRsiCollection;
+        private double rsiIndicatorRow;
 
         public Person CurPerson
         {
@@ -120,6 +136,17 @@ namespace SmaDesktopTerminal.Models
             }
 
         }
+
+        public List<string> ChartTypes
+        {
+            get => chartTypes;
+            set
+            {
+                chartTypes = value;
+                OnPropertyChanged();
+            }
+        }
+
         public string SelectedChartInterval
         {
             get
@@ -134,19 +161,6 @@ namespace SmaDesktopTerminal.Models
 
         }
 
-        public PlotModel CandlesChart
-        {
-            get
-            {
-                return candlesChart;
-            }
-            set
-            {
-                candlesChart = value;
-                OnPropertyChanged();
-            }
-
-        }
 
         internal void LogOut()
         {
@@ -212,6 +226,16 @@ namespace SmaDesktopTerminal.Models
 
         }
 
+
+        public SeriesCollection SeriesRsiCollection
+        {
+            get => seriesRsiCollection;
+            set
+            {
+                seriesRsiCollection = value;
+                OnPropertyChanged();
+            }
+        }
 
         public InstrumentsAnalysisInfo MovingAveragesInfo
         {
@@ -348,10 +372,72 @@ namespace SmaDesktopTerminal.Models
             }
         }
 
+        public string SelectedChartType
+        {
+            get => selectedChartType;
+            set
+            {
+                selectedChartType = value;
+                OnPropertyChanged();
+            }
+        }
+
+
+        public ObservableCollection<ChartIndicatorInfo> ChartIndicators
+        {
+            get => chartIndicators;
+            set
+            {
+                chartIndicators = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public Dictionary<string, string> AvailableChartIndicators
+        {
+            get => availableChartIndicators;
+            set
+            {
+                availableChartIndicators = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public KeyValuePair<string, string> SelectedAvailableChartIndicator
+        {
+            get => selectedAvailableChartIndicator;
+            set
+            {
+                selectedAvailableChartIndicator = value;
+                OnPropertyChanged();
+            }
+        }
+
+
+        public ICommand AddIndicatorToChartCommand
+        {
+            get => addIndicatorToChartCommand;
+            set
+            {
+                addIndicatorToChartCommand = value;
+                OnPropertyChanged();
+            }
+        }
+
+
+        public double RsiIndicatorRow
+        {
+            get => rsiIndicatorRow;
+            set
+            {
+                rsiIndicatorRow = value;
+                OnPropertyChanged();
+            }
+        }
+
         public TerminalWindowModel(AppMainModel mainModel, Person person)
         {
             this.mainModel = mainModel;
-            //var authToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoibWFkbWF4IiwiaHR0cDovL3NjaGVtYXMubWljcm9zb2Z0LmNvbS93cy8yMDA4LzA2L2lkZW50aXR5L2NsYWltcy9yb2xlIjoiYWRtaW4iLCJVc2VySWQiOiIxIiwiRmlyc3ROYW1lIjoi0JzQsNC60YHQuNC8IiwiU2Vjb25kTmFtZSI6ItCT0LvRg9GI0LDQutC-0LIiLCJFbWFpbCI6ImdsdXNoYWtvdm1heEBtYWlsLnJ1IiwiaXNzIjoiU21hQXV0aFNlcnZpY2UiLCJhdWQiOiJodHRwOi8vbG9jYWxob3N0LyJ9.tGKQu2877h_8axW8LtOmCpZ_DZRThEsXyNmj269BS9g";
             urlToService = "http://localhost:4000/";
 
 
@@ -359,15 +445,17 @@ namespace SmaDesktopTerminal.Models
             httpClientService.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", person.AuthToken);
             CurPerson = person;
             Instruments = new ObservableCollection<Instrument>();
-            CandlesChart = new PlotModel();
 
             SeriesCollection = new SeriesCollection();
             SeriesVolumeCollection = new SeriesCollection();
             Labels = new List<string>();
 
+            SeriesRsiCollection = new SeriesCollection();
+
             AnalyseProgressBarVisibility = Visibility.Hidden;
             InstrumentsProgressBarVisibility = Visibility.Hidden;
             ChartProgressBarVisibility = Visibility.Hidden;
+            brushConverter = new System.Windows.Media.BrushConverter();
 
             OperationUserControllerInst = new OperationUserController(Instruments)
             {
@@ -381,14 +469,15 @@ namespace SmaDesktopTerminal.Models
                 PortfolioProgressBarVisibility = Visibility.Hidden
             };
 
+            ChartIndicators = new ObservableCollection<ChartIndicatorInfo>();
+            AddIndicatorToChartCommand = new ActionCommand(AddIndicatorToChart);
             desktopTerminalWindow = new DesktopTerminalWindow(this);
             desktopTerminalWindow.Show();
 
-            InitIntervals();
-            //ReloadCandles();
+            InitComboBoxItems();
         }
 
-        private void InitIntervals()
+        private void InitComboBoxItems()
         {
             ChartIntervals = new List<string>()
             {
@@ -400,6 +489,22 @@ namespace SmaDesktopTerminal.Models
                 "day",
                 "week",
                 "month"
+            };
+
+            ChartTypes = new List<string>(){
+            "Область",
+            "Свечи",
+            "Бары"
+            };
+
+            AvailableChartIndicators = new Dictionary<string, string>()
+            {
+                { "Скользящее среднее","SMA"},
+                { "Экспоненциальное скользящее среднее","EMA"},
+                { "Взвешенное скользящее среднее","WMA"},
+                { "Моментум","Momentum"},
+                { "Индекс относительной силы","RSI"},
+                { "Чудесный осциллятор","AO"},
             };
         }
 
@@ -525,11 +630,25 @@ namespace SmaDesktopTerminal.Models
 
                     ChartProgressBarVisibility = Visibility.Visible;
 
+                    var dateStart = DateTime.Now.AddDays(-5);
+                    if (selectedChartInterval == "day")
+                        dateStart = DateTime.Now.AddDays(-70);
+
+                    if (selectedChartInterval == "week")
+                        dateStart = DateTime.Now.AddDays(-450);
+
+                    if (selectedChartInterval == "month")
+                        dateStart = DateTime.Now.AddMonths(-50);
+
+                    if (selectedChartInterval == "hour")
+                        dateStart = DateTime.Now.AddDays(-10);
+
+
                     var candlesRequest = new CandlesRequest()
                     {
                         InstrumentId = (uint)SelectedInstrument.FinamEmitentIDInt,
                         Interval = selectedChartInterval,
-                        DateStart = DateTime.Now.AddYears(-1),
+                        DateStart = dateStart,
                         DateEnd = DateTime.Now.AddDays(1)
                     };
                     var res = await CallRest.PostAsync<CandlesRequest, CandlesResponse>(
@@ -539,6 +658,7 @@ namespace SmaDesktopTerminal.Models
                     if (candlesRequest.InstrumentId != (uint)SelectedInstrument.FinamEmitentIDInt)
                         return;
 
+                    lastCandlesResponse = res?.Response;
                     if (res?.Response?.Candles?.Any() == true)
                     {
                         LastSelInstrumentCandle = res.Response.LastCandle;
@@ -600,7 +720,13 @@ namespace SmaDesktopTerminal.Models
                     OscillatorsInfo = new InstrumentsAnalysisInfo(oscillator);
 
                     dict.TryGetValue(3, out var mlMethods);
-                    MlAnalysisInfo = new InstrumentsAnalysisInfo(mlMethods);
+                    var mlConsolidate = new ConsolidateInstrumentsAnalysis(res.Response.Predictions);
+                    mlConsolidate.SetMlSummary(mlMethods?.FirstOrDefault()?.PredictionDecision);
+                    MlAnalysisInfo = new InstrumentsAnalysisInfo(mlMethods)
+                    {
+                        ConsolidateAnalysisInfo = mlConsolidate
+                    };
+
 
                 }
                 catch (Exception ex)
@@ -631,73 +757,119 @@ namespace SmaDesktopTerminal.Models
             ReloadCandlesForChart();
         }
 
+        public void AddIndicatorToChart()
+        {
+            if (selectedAvailableChartIndicator.Value == "SMA")
+            {
+                var chartIndicatorInfo = new ChartIndicatorInfo("SMA") { Indicator = new SimpleMovingAverage() };
+                ChartIndicators.Add(chartIndicatorInfo);
+            }
+
+            if (selectedAvailableChartIndicator.Value == "EMA")
+            {
+                var chartIndicatorInfo = new ChartIndicatorInfo("EMA") { Indicator = new ExponentialMovingAverage(9) };
+                ChartIndicators.Add(chartIndicatorInfo);
+            }
+
+            if (selectedAvailableChartIndicator.Value == "WMA")
+            {
+                var chartIndicatorInfo = new ChartIndicatorInfo("WMA") { Indicator = new WeightedMovingAverage(9) };
+                ChartIndicators.Add(chartIndicatorInfo);
+            }
+
+            if (selectedAvailableChartIndicator.Value == "AO")
+            {
+                var chartIndicatorInfo = new ChartIndicatorInfo("AO") { Indicator = new AwesomeOscillator() };
+                ChartIndicators.Add(chartIndicatorInfo);
+            }
+
+            if (selectedAvailableChartIndicator.Value == "RSI")
+            {
+                var chartIndicatorInfo = new ChartIndicatorInfo("RSI") { Indicator = new RelativeStrengthIndex(14) };
+                ChartIndicators.Add(chartIndicatorInfo);
+            }
+
+            if (selectedAvailableChartIndicator.Value == "Momentum")
+            {
+                var chartIndicatorInfo = new ChartIndicatorInfo("Momentum") { Indicator = new Momentum() };
+                ChartIndicators.Add(chartIndicatorInfo);
+            }
 
 
-        //private void FillPlotByNewData(CandlesResponse candlesResponse)
-        //{
-        //    VolumeStyle volumeStyle = VolumeStyle.Stacked;
-        //    var series = new CandleStickAndVolumeSeries
-        //    {
-        //        PositiveColor = OxyColors.Green,
-        //        NegativeColor = OxyColors.Red,
-        //        PositiveHollow = false,
-        //        NegativeHollow = false,
-        //        SeparatorColor = OxyColors.Gray,
-        //        SeparatorLineStyle = LineStyle.Dash,
-        //        VolumeStyle = volumeStyle,
-        //        //StrokeThickness = 3
-        //    };
-        //    //CandlesChart.Series.Clear();
-        //    //CandlesChart.Series.Add(series);
+            ChartRefresh();
+        }
 
-        //    double i = 1;
-        //    foreach (var oneCandle in candlesResponse.Candles.Take(50))
-        //    {
-        //        var time = DateTimeAxis.ToDouble(oneCandle.Date);
-        //        series.Append(new OhlcvItem(time, oneCandle.Open, oneCandle.High, oneCandle.Low, oneCandle.Close));
-        //        i++;
-        //    }
-        //    OnPropertyChanged("CandlesChart");
-        //    //series.Append(new OhlcvItem(1, 3, 5, 1, 4));
-        //    //series.Append(new OhlcvItem(2, 4, 5, 1, 3));
-        //    //Random random = new Random();
-        //    //for (int i = 3; i < 20; i++)
-        //    //{
-        //    //    var item = random.Next(1, i);
-        //    //    series.Append(new OhlcvItem(i, item, item + 10, item - 3, item + 1));
-        //    //}
-
-        //    PlotModel plotModel = new PlotModel();
-        //    //CandlesChart.Series.Add(series);
-        //    plotModel.Series.Add(series);
-        //    CandlesChart = plotModel;
-
-
-        //}
         private async void FillPlotByNewData(CandlesResponse candlesResponse)
         {
             SeriesCollection = new SeriesCollection(); //если хочешь обновлять данные, то удали это
             SeriesVolumeCollection = new SeriesCollection();
             Labels = new List<string>();
 
+            //{
 
-            var series = new CandleSeries()
+            foreach (var oneIndicator in ChartIndicators)
             {
-                Values = new ChartValues<OhlcPoint>(),
+                oneIndicator.InitSeriesCollection();
+            }
+
+
+            //var chartIndicatorInfo = new ChartIndicatorInfo("SMA") { Indicator = new SimpleMovingAverage() };
+            //chartIndicatorInfo.InitSeriesCollection();
+
+
+            //var seriesSma = new GLineSeries()
+            //{
+            //    Values = new GearedValues<double>(),
+            //    Title = "SMA (9)",
+            //    Fill = System.Windows.Media.Brushes.Transparent
+            //};
+
+            ISeriesView series = new GCandleSeries()
+            {
+                Values = new GearedValues<OhlcPoint>(),
+                Fill = System.Windows.Media.Brushes.Silver,
+                Title = "",
             };
 
-            var volumeSeries = new LiveCharts.Wpf.ColumnSeries()
+            if (SelectedChartType == "Область")
+            {
+                var brush = (System.Windows.Media.Brush)brushConverter.ConvertFromString("#225885");
+                if (brush != null) brush.Opacity = 0.5d;
+                var brush2 = (System.Windows.Media.Brush)brushConverter.ConvertFromString("#4682b4");
+
+                series = new GLineSeries()
+                {
+                    Values = new GearedValues<double>(),
+                    Stroke = brush2,
+                    Fill = brush,
+                    Title = "Цена"
+                };
+            }
+
+            if (SelectedChartType == "Бары")
+            {
+                series = new GOhlcSeries()
+                {
+                    Title = "",
+                    Values = new GearedValues<OhlcPoint>(),
+                    Fill = System.Windows.Media.Brushes.Silver,
+                };
+            }
+
+            var volumeSeries = new GColumnSeries()
             {
                 Title = "Объем",
-                Values = new ChartValues<double>()
+                Values = new GearedValues<double>()
             };
+
+
 
             //if (SeriesCollection.Any()) // можно спокойно добавлять объекты в коллекцию
             //series = (CandleSeries)SeriesCollection[0];
             var skipCnt = candlesResponse.Candles.Count - 100;
             candlesResponse.Candles = candlesResponse.Candles.Skip(skipCnt).Take(100).ToList();
 
-            var labels = await FillSeriesBeforeShow(candlesResponse, series, volumeSeries);
+            var labels = await FillSeriesBeforeShow(candlesResponse, series, volumeSeries, SelectedChartType, ChartIndicators);
 
             MaxAxesVal = candlesResponse.Candles.Count;
             //MaxAxesVal = 30;
@@ -710,26 +882,46 @@ namespace SmaDesktopTerminal.Models
 
             SeriesCollection.Add(series);
             SeriesVolumeCollection.Add(volumeSeries);
+
+
+
             Labels = labels;
             MaxAxesVal = candlesResponse.Candles.Count;
             MinAxesVal = MaxAxesVal - 30;
+
+            foreach (var oneIndicator in ChartIndicators)
+            {
+                switch (oneIndicator.IndicatorShortName)
+                {
+                    case "SMA":
+                    case "EMA":
+                    case "WMA":
+                        {
+                            SeriesCollection.AddRange(oneIndicator.SeriesCollectionForIndicator);
+                            break;
+                        }
+                    case "RSI":
+                        {
+                            RsiIndicatorRow = 100;
+                            SeriesRsiCollection.AddRange(oneIndicator.SeriesCollectionForIndicator);
+                            break;
+                        }
+                }
+            }
         }
 
-        private Task<List<string>> FillSeriesBeforeShow(CandlesResponse candlesResponse, CandleSeries candleSeries, ColumnSeries volumeSeries)
+        private Task<List<string>> FillSeriesBeforeShow(CandlesResponse candlesResponse, ISeriesView candleSeries, GColumnSeries volumeSeries, string chartType, ObservableCollection<ChartIndicatorInfo> chartIndicators)
         {
             var task = new Task<List<string>>(
                 () =>
                 {
-                    //var series = new CandleSeries()
-                    //{
-                    //    Values = new ChartValues<OhlcPoint>(),
-                    //};
 
-                    //var volumeSeries = new LiveCharts.Wpf.ColumnSeries()
-                    //{
-                    //    Title = "Объем",
-                    //    Values = new ChartValues<double>()
-                    //};
+                    foreach (var oneIndicator in chartIndicators)
+                    {
+                        oneIndicator.CalculateIndicatorValuesAndFillSeries(candlesResponse.Candles, 100);
+                    }
+
+
                     var firstCandle = candlesResponse.Candles.First();
                     var labels = new List<string>();
                     var dtFormat = "dd.MM.yyyy HH:mm";
@@ -739,8 +931,37 @@ namespace SmaDesktopTerminal.Models
                     //GearedValues
                     foreach (var oneCandle in candlesResponse.Candles)
                     {
-                        candleSeries.Values.Add(new OhlcPoint(oneCandle.Open, oneCandle.High, oneCandle.Low, oneCandle.Close));
+                        if (chartType == "Область")
+                        { candleSeries.Values.Add(oneCandle.Close); }
+                        else
+                        { candleSeries.Values.Add(new OhlcPoint(oneCandle.Open, oneCandle.High, oneCandle.Low, oneCandle.Close)); }
+
                         volumeSeries.Values.Add((double)oneCandle.Volume);
+                        labels.Add(oneCandle.Date.ToString(dtFormat));
+                    }
+
+                    return labels;
+                });
+
+            task.Start();
+            return task;
+        }
+        private Task<List<string>> FillSeriesBeforeShow2(CandlesResponse candlesResponse, GLineSeries candleSeries, ColumnSeries volumeSeries)
+        {
+            var task = new Task<List<string>>(
+                () =>
+                {
+
+                    var firstCandle = candlesResponse.Candles.First();
+                    var labels = new List<string>();
+                    var dtFormat = "dd.MM.yyyy HH:mm";
+                    if (firstCandle.Interval == CandlesInterval.Day || firstCandle.Interval == CandlesInterval.Week || firstCandle.Interval == CandlesInterval.Month)
+                        dtFormat = "dd.MM.yyyy";
+
+                    foreach (var oneCandle in candlesResponse.Candles)
+                    {
+                        //candleSeries.Values.Add(new OhlcPoint(oneCandle.Open, oneCandle.High, oneCandle.Low, oneCandle.Close));
+                        candleSeries.Values.Add(oneCandle.Close);
                         labels.Add(oneCandle.Date.ToString(dtFormat));
                     }
 
@@ -804,6 +1025,18 @@ namespace SmaDesktopTerminal.Models
                 ReloadPortfolioTab();
             }
         }
+
+
+        private void SelectedChartTypeChanged()
+        {
+
+        }
+
+
+
+
+
+
 
         private void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
