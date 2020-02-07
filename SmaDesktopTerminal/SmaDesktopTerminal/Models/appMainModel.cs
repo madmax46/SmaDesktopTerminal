@@ -65,7 +65,7 @@ namespace SmaDesktopTerminal.Models
             //    FullName = "Глушаков Максим Васильевич"
             //};
 
-            //TerminalWindowModel windowModel = new TerminalWindowModel(this);
+            //TerminalWindowModel WindowModel = new TerminalWindowModel(this);
             //DesktopTerminalWindow terminalWindow = new DesktopTerminalWindow();
             //terminalWindow.Show();
             //Windows.LogInWindow logInWindow = new Windows.LogInWindow();

@@ -81,7 +81,8 @@ namespace SmaDesktopTerminal.Models
         private KeyValuePair<string, string> selectedAvailableChartIndicator;
         private ICommand addIndicatorToChartCommand;
         private SeriesCollection seriesRsiCollection;
-        private double rsiIndicatorRow;
+        private GridLength chartsListHeight;
+        private ObservableCollection<ChartInfo> chartsAll;
 
         public Person CurPerson
         {
@@ -425,15 +426,26 @@ namespace SmaDesktopTerminal.Models
         }
 
 
-        public double RsiIndicatorRow
+        public GridLength ChartsListHeight
         {
-            get => rsiIndicatorRow;
+            get => chartsListHeight;
             set
             {
-                rsiIndicatorRow = value;
+                chartsListHeight = value;
                 OnPropertyChanged();
             }
         }
+
+        public ObservableCollection<ChartInfo> ChartsAll
+        {
+            get => chartsAll;
+            set
+            {
+                chartsAll = value;
+                OnPropertyChanged();
+            }
+        }
+
 
         public TerminalWindowModel(AppMainModel mainModel, Person person)
         {
@@ -449,8 +461,9 @@ namespace SmaDesktopTerminal.Models
             SeriesCollection = new SeriesCollection();
             SeriesVolumeCollection = new SeriesCollection();
             Labels = new List<string>();
-
+            ChartsAll = new ObservableCollection<ChartInfo>();
             SeriesRsiCollection = new SeriesCollection();
+            ChartsListHeight = new GridLength();
 
             AnalyseProgressBarVisibility = Visibility.Hidden;
             InstrumentsProgressBarVisibility = Visibility.Hidden;
@@ -505,6 +518,8 @@ namespace SmaDesktopTerminal.Models
                 { "Моментум","Momentum"},
                 { "Индекс относительной силы","RSI"},
                 { "Чудесный осциллятор","AO"},
+                { "Уровень MACD","MACD"},
+                { "Процентный диапазон Вильямса","WPR"},
             };
         }
 
@@ -631,6 +646,7 @@ namespace SmaDesktopTerminal.Models
                     ChartProgressBarVisibility = Visibility.Visible;
 
                     var dateStart = DateTime.Now.AddDays(-5);
+
                     if (selectedChartInterval == "day")
                         dateStart = DateTime.Now.AddDays(-70);
 
@@ -664,7 +680,6 @@ namespace SmaDesktopTerminal.Models
                         LastSelInstrumentCandle = res.Response.LastCandle;
                         FillPlotByNewData(res.Response);
                     }
-
                 }
                 catch (Exception ex)
                 {
@@ -761,37 +776,49 @@ namespace SmaDesktopTerminal.Models
         {
             if (selectedAvailableChartIndicator.Value == "SMA")
             {
-                var chartIndicatorInfo = new ChartIndicatorInfo("SMA") { Indicator = new SimpleMovingAverage() };
+                var chartIndicatorInfo = new ChartIndicatorInfo("SMA", DeleteIndicatorFromChart, ChartRefresh) { Indicator = new SimpleMovingAverage() };
                 ChartIndicators.Add(chartIndicatorInfo);
             }
 
             if (selectedAvailableChartIndicator.Value == "EMA")
             {
-                var chartIndicatorInfo = new ChartIndicatorInfo("EMA") { Indicator = new ExponentialMovingAverage(9) };
+                var chartIndicatorInfo = new ChartIndicatorInfo("EMA", DeleteIndicatorFromChart, ChartRefresh) { Indicator = new ExponentialMovingAverage(9) };
                 ChartIndicators.Add(chartIndicatorInfo);
             }
 
             if (selectedAvailableChartIndicator.Value == "WMA")
             {
-                var chartIndicatorInfo = new ChartIndicatorInfo("WMA") { Indicator = new WeightedMovingAverage(9) };
+                var chartIndicatorInfo = new ChartIndicatorInfo("WMA", DeleteIndicatorFromChart, ChartRefresh) { Indicator = new WeightedMovingAverage(9) };
                 ChartIndicators.Add(chartIndicatorInfo);
             }
 
             if (selectedAvailableChartIndicator.Value == "AO")
             {
-                var chartIndicatorInfo = new ChartIndicatorInfo("AO") { Indicator = new AwesomeOscillator() };
+                var chartIndicatorInfo = new ChartIndicatorInfo("AO", DeleteIndicatorFromChart, ChartRefresh) { Indicator = new AwesomeOscillator() };
                 ChartIndicators.Add(chartIndicatorInfo);
             }
 
             if (selectedAvailableChartIndicator.Value == "RSI")
             {
-                var chartIndicatorInfo = new ChartIndicatorInfo("RSI") { Indicator = new RelativeStrengthIndex(14) };
+                var chartIndicatorInfo = new ChartIndicatorInfo("RSI", DeleteIndicatorFromChart, ChartRefresh) { Indicator = new RelativeStrengthIndex(14) };
                 ChartIndicators.Add(chartIndicatorInfo);
             }
 
             if (selectedAvailableChartIndicator.Value == "Momentum")
             {
-                var chartIndicatorInfo = new ChartIndicatorInfo("Momentum") { Indicator = new Momentum() };
+                var chartIndicatorInfo = new ChartIndicatorInfo("Momentum", DeleteIndicatorFromChart, ChartRefresh) { Indicator = new Momentum() };
+                ChartIndicators.Add(chartIndicatorInfo);
+            }
+
+            if (selectedAvailableChartIndicator.Value == "MACD")
+            {
+                var chartIndicatorInfo = new ChartIndicatorInfo("MACD", DeleteIndicatorFromChart, ChartRefresh) { Indicator = new Macd() };
+                ChartIndicators.Add(chartIndicatorInfo);
+            }
+
+            if (selectedAvailableChartIndicator.Value == "WPR")
+            {
+                var chartIndicatorInfo = new ChartIndicatorInfo("WPR", DeleteIndicatorFromChart, ChartRefresh) { Indicator = new WilliamsPercentRange() };
                 ChartIndicators.Add(chartIndicatorInfo);
             }
 
@@ -801,11 +828,27 @@ namespace SmaDesktopTerminal.Models
 
         private async void FillPlotByNewData(CandlesResponse candlesResponse)
         {
-            SeriesCollection = new SeriesCollection(); //если хочешь обновлять данные, то удали это
-            SeriesVolumeCollection = new SeriesCollection();
-            Labels = new List<string>();
+            //SeriesCollection = new SeriesCollection(); //если хочешь обновлять данные, то удали это
+            //var mainChartSeriesCollection = new SeriesCollection(); //если хочешь обновлять данные, то удали это
+            //SeriesVolumeCollection = new SeriesCollection();
+            //Labels = new List<string>();
 
-            //{
+
+            ChartsAll.Clear();
+
+            //var actualHeight = desktopTerminalWindow.MainChartsRow.ActualHeight;
+            var mainChart = new ChartInfo(this)
+            {
+                SeriesCollection = new SeriesCollection()
+            };
+
+
+            var volumeChart = new ChartInfo(this)
+            {
+                Height = 100d,
+                SeriesCollection = new SeriesCollection()
+            };
+
 
             foreach (var oneIndicator in ChartIndicators)
             {
@@ -813,16 +856,6 @@ namespace SmaDesktopTerminal.Models
             }
 
 
-            //var chartIndicatorInfo = new ChartIndicatorInfo("SMA") { Indicator = new SimpleMovingAverage() };
-            //chartIndicatorInfo.InitSeriesCollection();
-
-
-            //var seriesSma = new GLineSeries()
-            //{
-            //    Values = new GearedValues<double>(),
-            //    Title = "SMA (9)",
-            //    Fill = System.Windows.Media.Brushes.Transparent
-            //};
 
             ISeriesView series = new GCandleSeries()
             {
@@ -866,13 +899,10 @@ namespace SmaDesktopTerminal.Models
 
             //if (SeriesCollection.Any()) // можно спокойно добавлять объекты в коллекцию
             //series = (CandleSeries)SeriesCollection[0];
-            var skipCnt = candlesResponse.Candles.Count - 100;
-            candlesResponse.Candles = candlesResponse.Candles.Skip(skipCnt).Take(100).ToList();
 
             var labels = await FillSeriesBeforeShow(candlesResponse, series, volumeSeries, SelectedChartType, ChartIndicators);
 
             MaxAxesVal = candlesResponse.Candles.Count;
-            //MaxAxesVal = 30;
             MinAxesVal = MaxAxesVal - 30;
 
             //if (!seriesCollection.Any())
@@ -880,14 +910,25 @@ namespace SmaDesktopTerminal.Models
             //else
             //    SeriesCollection[0] = series;
 
+
+            var charts = new List<ChartInfo>();
+
+            mainChart.SeriesCollection.Add(series);
+            volumeChart.SeriesCollection.Add(volumeSeries);
+
+            charts.Add(mainChart);
+            charts.Add(volumeChart);
+
+            //mainChart.Lables = labels;
+            //volumeChart.Lables = labels;
+
+
             SeriesCollection.Add(series);
-            SeriesVolumeCollection.Add(volumeSeries);
-
-
-
             Labels = labels;
             MaxAxesVal = candlesResponse.Candles.Count;
             MinAxesVal = MaxAxesVal - 30;
+
+
 
             foreach (var oneIndicator in ChartIndicators)
             {
@@ -897,17 +938,35 @@ namespace SmaDesktopTerminal.Models
                     case "EMA":
                     case "WMA":
                         {
-                            SeriesCollection.AddRange(oneIndicator.SeriesCollectionForIndicator);
+                            mainChart.SeriesCollection.AddRange(oneIndicator.SeriesCollectionForIndicator);
                             break;
                         }
+                    case "Momentum":
+                    case "AO":
                     case "RSI":
+                    case "MACD":
+                    case "WPR":
                         {
-                            RsiIndicatorRow = 100;
-                            SeriesRsiCollection.AddRange(oneIndicator.SeriesCollectionForIndicator);
+                            var indicatorChart = new ChartInfo(this)
+                            {
+                                Height = 100d,
+                                SeriesCollection = oneIndicator.SeriesCollectionForIndicator
+                            };
+                            charts.Add(indicatorChart);
                             break;
                         }
                 }
             }
+
+            charts.ForEach(r =>
+            {
+                r.Lables = labels;
+                r.MaxAxesVal = MaxAxesVal;
+                r.MinAxesVal = MinAxesVal;
+                ChartsAll.Add(r);
+            });
+
+            UpdateChartsHeight();
         }
 
         private Task<List<string>> FillSeriesBeforeShow(CandlesResponse candlesResponse, ISeriesView candleSeries, GColumnSeries volumeSeries, string chartType, ObservableCollection<ChartIndicatorInfo> chartIndicators)
@@ -920,6 +979,10 @@ namespace SmaDesktopTerminal.Models
                     {
                         oneIndicator.CalculateIndicatorValuesAndFillSeries(candlesResponse.Candles, 100);
                     }
+
+                    var skipCnt = candlesResponse.Candles.Count - 100;
+                    candlesResponse.Candles = candlesResponse.Candles.Skip(skipCnt).Take(100).ToList();
+
 
 
                     var firstCandle = candlesResponse.Candles.First();
@@ -1027,15 +1090,40 @@ namespace SmaDesktopTerminal.Models
         }
 
 
-        private void SelectedChartTypeChanged()
+        public void DeleteIndicatorFromChart(ChartIndicatorInfo indicatorInfo)
         {
 
+            try
+            {
+                ChartIndicators.Remove(indicatorInfo);
+                var toRemove = ChartsAll.Where(r => r.SeriesCollection.All(r2 => indicatorInfo.SeriesCollectionForIndicator.Contains(r2)))
+                     .ToList();
+
+                if (toRemove.Any())
+                {
+                    foreach (var oneToRemove in toRemove)
+                    {
+                        ChartsAll.Remove(oneToRemove);
+                    }
+                }
+                else
+                {
+                    ChartRefresh();
+
+                }
+            }
+            catch (Exception e)
+            {
+
+            }
         }
 
 
 
+        private void SelectedChartTypeChanged()
+        {
 
-
+        }
 
 
         private void OnPropertyChanged([CallerMemberName] string propertyName = null)
@@ -1046,6 +1134,23 @@ namespace SmaDesktopTerminal.Models
         public void ShutDownApp()
         {
             mainModel.ShutDownApp();
+        }
+
+        public void UpdateChartsHeight()
+        {
+            var actualHeight = desktopTerminalWindow.MainChartsRow.ActualHeight;
+
+            var countCharts = ChartsAll?.Count ?? 0;
+
+            if (countCharts < 2)
+                return;
+
+            var heightMainChart = actualHeight - (countCharts - 1) * 115;
+            if (heightMainChart < actualHeight / 2)
+                heightMainChart = actualHeight / 2;
+
+            chartsAll.First().Height = heightMainChart;
+
         }
     }
 }

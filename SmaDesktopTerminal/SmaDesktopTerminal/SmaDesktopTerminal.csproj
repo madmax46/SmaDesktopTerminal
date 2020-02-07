@@ -61,6 +61,7 @@
     </ApplicationDefinition>
     <Compile Include="Classes\Analytics\ConsolidateInstrumentsAnalysis.cs" />
     <Compile Include="Classes\Analytics\InstrumentsAnalysisInfo.cs" />
+    <Compile Include="Classes\ChartInfo.cs" />
     <Compile Include="Classes\Indicators\ChartIndicatorInfo.cs" />
     <Compile Include="Classes\Interface\OperationsHistoryUserController.cs" />
     <Compile Include="Classes\Interface\OperationUserController.cs" />
@@ -70,11 +71,15 @@
     <Compile Include="Models\LogInWindowModel.cs" />
     <Compile Include="Models\TerminalWindowModel.cs" />
     <Compile Include="Models\ThemesController.cs" />
+    <Compile Include="Properties\Annotations.cs" />
     <Compile Include="Windows\CircularProgressBar.xaml.cs">
       <DependentUpon>CircularProgressBar.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Windows\IndicatorsParams\MovingAverageParams.xaml.cs">
-      <DependentUpon>MovingAverageParams.xaml</DependentUpon>
+    <Compile Include="Windows\IndicatorsParams\PeriodIndicatorsSettings.xaml.cs">
+      <DependentUpon>PeriodIndicatorsSettings.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\IndicatorsParams\PeriodMacdIndicatorSettings.xaml.cs">
+      <DependentUpon>PeriodMacdIndicatorSettings.xaml</DependentUpon>
     </Compile>
     <Compile Include="Windows\LogInWindow.xaml.cs">
       <DependentUpon>LogInWindow.xaml</DependentUpon>
@@ -101,7 +106,11 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Windows\IndicatorsParams\MovingAverageParams.xaml">
+    <Page Include="Windows\IndicatorsParams\PeriodIndicatorsSettings.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Windows\IndicatorsParams\PeriodMacdIndicatorSettings.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -195,6 +204,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Classes\Auth\" />
+    <Folder Include="Classes\Commands\" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\icons8-settings-32.png">
@@ -203,6 +213,9 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\icons8-synchronize-30.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\icons8-cancel-30.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

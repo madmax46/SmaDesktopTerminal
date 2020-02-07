@@ -16,7 +16,9 @@
         Title="Desktop Терминал" Height="600" Width="1024" Style="{DynamicResource WindowStyle}"
         Loaded="Window_Loaded"
         Closing="DesktopTerminalWindow_OnClosing"
-        WindowStartupLocation="CenterScreen">
+        WindowStartupLocation="CenterScreen"
+        x:Name="desktopTerminalWindow"
+>
     <!--xmlns:geared="clr-namespace:LiveCharts.Geared;assembly=LiveCharts.Geared"-->
     <Window.Resources>
         <Style x:Key="resizedCalendarItem" TargetType="{x:Type Calendar}">
@@ -34,6 +36,7 @@
             </Setter>
         </Style>
     </Window.Resources>
+
 
 
     <Grid x:Name="terminalMainGrid" Style="{DynamicResource MainGridStyle}" >
@@ -55,7 +58,7 @@
             <Button Name="ButtonLogOut" Grid.Column="3" Click="ButtonLogOut_OnClick" Margin="15,5" >Выход</Button>
         </Grid>
         <TabControl x:Name="workWindowsTabControl" Grid.Row="1" Style="{DynamicResource MainTabControlStyle}" >
-            <TabItem Header="Портфель">
+            <TabItem Header="Портфель"  Style="{DynamicResource TabItemStyle}" >
                 <Grid Style="{DynamicResource MainGridStyle }">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="600*" MinWidth="600"></ColumnDefinition>
@@ -214,7 +217,7 @@
 
                         <Grid Row="0" >
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="400"></ColumnDefinition>
+                                <ColumnDefinition Width="400" MinWidth="400"></ColumnDefinition>
                                 <ColumnDefinition Width="1*"></ColumnDefinition>
                             </Grid.ColumnDefinitions>
 
@@ -406,7 +409,7 @@
 
                 </Grid>
             </TabItem>
-            <TabItem Header="Обзор"  >
+            <TabItem Header="Обзор" Style="{DynamicResource TabItemStyle}" >
                 <Grid Style="{DynamicResource MainGridStyle }" >
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition MinWidth="200" Width="220" MaxWidth="500" x:Name="firstColumn"></ColumnDefinition>
@@ -437,7 +440,7 @@
                                     <windows:CircularProgressBar x:Name="InstrumentsProgressBar" Grid.Column="2"  HorizontalAlignment="Right" Visibility="{Binding InstrumentsProgressBarVisibility}" Height="30" Width="30" />
                                     <Line Stretch="Fill" VerticalAlignment="Bottom" X2="1" Fill="Black" HorizontalAlignment="Stretch" Grid.Column="0" Grid.ColumnSpan="4" Margin="5,0" StrokeThickness="1"  Stroke="Black" Height="1"/>
                                 </Grid>
-                                <ListView Name="ParsedInstrView" Grid.Row="1" ItemsSource="{Binding Instruments}" SelectionMode="Single" SelectedItem="{Binding SelectedInstrument , Mode=TwoWay}" SelectionChanged="parsedInstrView_SelectionChanged" Background="Transparent" SizeChanged="ListView_SizeChanged" ItemContainerStyle="{DynamicResource ListViewItemStyle}" BorderBrush="Transparent" BorderThickness="0" Margin="0,5,0,0" >
+                                <ListView Name="ParsedInstrView" Grid.Row="1" ItemsSource="{Binding Instruments}" SelectionMode="Single" SelectedItem="{Binding SelectedInstrument , Mode=TwoWay}" SelectionChanged="parsedInstrView_SelectionChanged" Background="Transparent" SizeChanged="ListView_SizeChanged" ItemContainerStyle="{DynamicResource ListViewItemStyle}" BorderBrush="Transparent" ScrollViewer.HorizontalScrollBarVisibility="Disabled" BorderThickness="0" Margin="0,5,0,0" >
                                     <ListView.View>
                                         <GridView >
                                             <GridViewColumn  >
@@ -468,11 +471,11 @@
                         </Grid>
                     </UserControl>
 
-                    <UserControl Name="chartUserControl" Grid.Row="0" Grid.Column="1" BorderBrush="Black" BorderThickness="1" Margin="5">
+                    <UserControl Name="ChartUserControl" Grid.Row="0" Grid.Column="1" BorderBrush="Black" DataContext="{Binding Path=DataContext, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}},  Mode=TwoWay}" BorderThickness="1" Margin="5">
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="35"></RowDefinition>
-                                <RowDefinition/>
+                                <RowDefinition Name="MainChartsRow" Height="{Binding ChartsListHeight, Mode=OneWayToSource}"/>
                             </Grid.RowDefinitions>
                             <Grid Grid.Row="0"  >
                                 <Grid.ColumnDefinitions>
@@ -492,14 +495,17 @@
                                 <Line Stretch="Fill" VerticalAlignment="Bottom" X2="1" Fill="Black" HorizontalAlignment="Stretch" Grid.Column="0" Grid.ColumnSpan="7"  Margin="5,0" StrokeThickness="1"  Stroke="Black" Height="1"/>
 
                             </Grid>
-                            <Grid Grid.Row="1">
+
+
+
+                            <!--<Grid Grid.Row="1">
                                 <Grid.RowDefinitions>
                                     <RowDefinition></RowDefinition>
                                     <RowDefinition Height="100"></RowDefinition>
                                     <RowDefinition Name="RsiIndicatorRow" Height="{Binding RsiRowChartHeight}" MaxHeight="100"></RowDefinition>
                                 </Grid.RowDefinitions>
 
-                                <lvc:CartesianChart Name="liveChartOhlc" Grid.Row="0" ScrollMode="X" Zoom="X" Series="{Binding SeriesCollection}" Margin="10,10" >
+                                <lvc:CartesianChart Name="liveChartOhlc" Visibility="Hidden" Grid.Row="0" ScrollMode="X" Zoom="X" Series="{Binding SeriesCollection}" Margin="10,10" >
                                     <lvc:CartesianChart.AxisX>
                                         <lvc:Axis Labels="{Binding Labels}" Separator="{x:Static lvc:DefaultAxes.CleanSeparator}"  Title="Time" MinValue="{Binding MinAxesVal, Mode=TwoWay}" MaxValue="{Binding MaxAxesVal, Mode=TwoWay}"  RangeChanged="Axis_RangeChanged" HorizontalAlignment="Left"/>
                                     </lvc:CartesianChart.AxisX>
@@ -511,12 +517,59 @@
                                     </lvc:CartesianChart.AxisX>
                                 </lvc:CartesianChart>
 
+                            
                                 <lvc:CartesianChart Name="liveChartRsi" Grid.Row="2" Series="{Binding SeriesRsiCollection}" Margin="10,10" >
                                     <lvc:CartesianChart.AxisX>
                                         <lvc:Axis Labels="{Binding Labels}" Separator="{x:Static lvc:DefaultAxes.CleanSeparator}"  MinValue="{Binding MinAxesVal, Mode=TwoWay}" MaxValue="{Binding MaxAxesVal, Mode=TwoWay}"/>
                                     </lvc:CartesianChart.AxisX>
                                 </lvc:CartesianChart>
-                            </Grid>
+                            </Grid>-->
+                            <!--<ListView  Grid.Row="1" ItemsSource="{Binding ChartsAll}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" BorderBrush="Transparent"  SelectionMode="Single" Background="Transparent" SizeChanged="ListView_SizeChanged" ItemContainerStyle="{DynamicResource ListViewItemStyle}" Margin="0,5,0,0" BorderThickness="0" >-->
+                            <ListView Name="MainChartsListView" Grid.Row="1" ItemsSource="{Binding ChartsAll}" Height="{Binding ChartsListHeight, Mode=OneWayToSource}" ItemContainerStyle="{DynamicResource ChartsListViewItemStyle}" VerticalAlignment="Top" ScrollViewer.HorizontalScrollBarVisibility="Disabled" BorderBrush="Transparent"  SelectionMode="Single" Background="Transparent" SizeChanged="ListViewCharts_SizeChanged" Margin="0,5,0,0" BorderThickness="0" >
+                                <ListView.Resources>
+                                    <Style TargetType="GridViewColumnHeader">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                    </Style>
+                                </ListView.Resources>
+                                <!--<ListView.ItemContainerStyle>
+                                    <Style TargetType="ListViewItem">
+
+                                        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                                        <Setter Property="VerticalContentAlignment" Value="Stretch"/>
+                                        <Setter Property="VerticalAlignment" Value="Stretch"/>
+                                    </Style>
+                                </ListView.ItemContainerStyle>-->
+                                <ListView.View>
+                                    <GridView >
+                                        <GridViewColumn>
+                                            <GridViewColumn.CellTemplate >
+                                                <DataTemplate >
+                                                    <Grid Background="Transparent"  Height="{Binding Height, Mode= TwoWay}" >
+                                                        <lvc:CartesianChart Height="{Binding Height, Mode=TwoWay}" Series="{Binding SeriesCollection}" ScrollMode="X" Zoom="X" >
+                                                            <lvc:CartesianChart.AxisX>
+                                                                <lvc:Axis Labels="{Binding Lables}" Separator="{x:Static lvc:DefaultAxes.CleanSeparator}"  MinValue="{Binding Path=MinAxesVal, Mode=TwoWay}" MaxValue="{Binding  Path=MaxAxesVal,  Mode=TwoWay}" />
+                                                            </lvc:CartesianChart.AxisX>
+                                                        </lvc:CartesianChart>
+                                                    </Grid>
+                                                </DataTemplate>
+                                            </GridViewColumn.CellTemplate>
+                                        </GridViewColumn>
+                                    </GridView>
+
+                                </ListView.View>
+                                <!--<ListView.ItemsPanel>
+                                    <ItemsPanelTemplate>
+
+                                    </ItemsPanelTemplate>
+                                </ListView.ItemsPanel>-->
+                                <!--<ListView.ItemsPanel>
+                                    <ItemsPanelTemplate >
+                                        <UniformGrid Columns="1" VerticalAlignment="Top" />
+                                    </ItemsPanelTemplate >
+                                </ListView.ItemsPanel>-->
+
+                            </ListView>
+
                         </Grid>
 
                     </UserControl>
@@ -582,7 +635,7 @@
                                 <ListView  Grid.Row="2" ItemsSource="{Binding ChartIndicators}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" BorderBrush="Transparent"  SelectionMode="Single" Background="Transparent" SizeChanged="ListView_SizeChanged" ItemContainerStyle="{DynamicResource ListViewItemStyle}" Margin="0,5,0,0" BorderThickness="0" >
                                     <ListView.View>
                                         <GridView >
-                                            <GridViewColumn  Width="170" >
+                                            <GridViewColumn  Width="160" >
                                                 <GridViewColumnHeader HorizontalContentAlignment="Stretch"  Background="Transparent" >
                                                     <TextBlock HorizontalAlignment="Stretch" Style="{DynamicResource MaiTextBlockStyle}">Название</TextBlock>
                                                 </GridViewColumnHeader>
@@ -608,7 +661,22 @@
                                                             <Grid.ColumnDefinitions >
                                                                 <ColumnDefinition Width="*" ></ColumnDefinition>
                                                             </Grid.ColumnDefinitions>
-                                                            <Button Width="20" Height="20" VerticalAlignment="Center" HorizontalAlignment="Left" Style="{DynamicResource ButtonIndicatorSettingsStyle}"></Button>
+                                                            <Button Width="20" Height="20" VerticalAlignment="Center" HorizontalAlignment="Left" Command="{Binding OpenSettingsCommand}" Style="{DynamicResource ButtonIndicatorSettingsStyle}"></Button>
+                                                        </Grid>
+                                                    </DataTemplate>
+                                                </GridViewColumn.CellTemplate>
+                                            </GridViewColumn>
+                                            <GridViewColumn  >
+                                                <GridViewColumnHeader HorizontalContentAlignment="Stretch"  Background="Transparent" >
+                                                    <TextBlock HorizontalAlignment="Stretch" Style="{DynamicResource MaiTextBlockStyle}"></TextBlock>
+                                                </GridViewColumnHeader>
+                                                <GridViewColumn.CellTemplate>
+                                                    <DataTemplate>
+                                                        <Grid Background="Transparent">
+                                                            <Grid.ColumnDefinitions >
+                                                                <ColumnDefinition Width="*" ></ColumnDefinition>
+                                                            </Grid.ColumnDefinitions>
+                                                            <Button Width="20" Height="20" VerticalAlignment="Center" HorizontalAlignment="Left" Command="{Binding RemoveIndicatorCommand}" Style="{DynamicResource ButtonIndicatorRemoveStyle}"></Button>
                                                         </Grid>
                                                     </DataTemplate>
                                                 </GridViewColumn.CellTemplate>
@@ -630,7 +698,7 @@
             <!--<TabItem Header="Интерактивный график">
                 <Grid Style="{DynamicResource MainGridStyle}" />
             </TabItem>-->
-            <TabItem Header="Технический анализ">
+            <TabItem Header="Технический анализ" Style="{DynamicResource TabItemStyle}" >
                 <Grid Style="{DynamicResource MainGridStyle}" >
                     <Grid.RowDefinitions>
                         <RowDefinition Height="50"></RowDefinition>

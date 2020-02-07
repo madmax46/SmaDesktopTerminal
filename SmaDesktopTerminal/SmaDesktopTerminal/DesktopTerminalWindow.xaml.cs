@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -22,20 +23,41 @@ namespace SmaDesktopTerminal
     /// <summary>
     /// Логика взаимодействия для MainWindow.xaml
     /// </summary>
-    public partial class DesktopTerminalWindow : Window
+    public partial class DesktopTerminalWindow : Window, INotifyPropertyChanged
     {
-        private readonly TerminalWindowModel windowModel;
+        private TerminalWindowModel windowModel;
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        public TerminalWindowModel WindowModel
+        {
+            get => windowModel;
+            set
+            {
+                windowModel = value;
+                OnPropertyChanged();
+            }
+        }
+
         public DesktopTerminalWindow(TerminalWindowModel windowModel)
         {
-            this.windowModel = windowModel;
             DataContext = windowModel;
+            //DataContext = this;
+            this.WindowModel = windowModel;
+
             InitializeComponent();
         }
+
+
+        private void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
 
-            windowModel.ReloadParsedInstrumentsAsync();
+            WindowModel.ReloadParsedInstrumentsAsync();
         }
 
         private void resizeThumb_DragDelta(object sender, System.Windows.Controls.Primitives.DragDeltaEventArgs e)
@@ -62,12 +84,12 @@ namespace SmaDesktopTerminal
 
         private void parsedInstrView_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            windowModel.InstrumentSelectionChanged();
+            WindowModel.InstrumentSelectionChanged();
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            windowModel.WindowLoaded();
+            WindowModel.WindowLoaded();
         }
 
         private void Button_Click_1(object sender, RoutedEventArgs e)
@@ -77,12 +99,12 @@ namespace SmaDesktopTerminal
 
         private void instrumentsUpdateBtn_Click(object sender, RoutedEventArgs e)
         {
-            windowModel.ReloadParsedInstrumentsAsync();
+            WindowModel.ReloadParsedInstrumentsAsync();
         }
 
         private void chartUpdateBtn_Click(object sender, RoutedEventArgs e)
         {
-            windowModel.ChartRefresh();
+            WindowModel.ChartRefresh();
         }
 
         private void Axis_RangeChanged(LiveCharts.Events.RangeChangedEventArgs eventArgs)
@@ -107,12 +129,12 @@ namespace SmaDesktopTerminal
 
         private void ChartIntervalComboBox_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            windowModel.InstrumentIntervalChanged();
+            WindowModel.InstrumentIntervalChanged();
         }
 
         private void ButtonLogOut_OnClick(object sender, RoutedEventArgs e)
         {
-            windowModel.LogOut();
+            WindowModel.LogOut();
         }
 
         private void ListView_SizeChanged(object sender, SizeChangedEventArgs e)
@@ -154,7 +176,7 @@ namespace SmaDesktopTerminal
 
         private void PortfolioUpdateBtn_OnClick(object sender, RoutedEventArgs e)
         {
-            windowModel.ReloadUserPortfolioAsync();
+            WindowModel.ReloadUserPortfolioAsync();
         }
 
         private void PortfolioInstrView_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -169,16 +191,23 @@ namespace SmaDesktopTerminal
 
         private void DesktopTerminalWindow_OnClosing(object sender, CancelEventArgs e)
         {
-            windowModel.ShutDownApp();
+            WindowModel.ShutDownApp();
         }
 
         private void ChartTypesComboBox_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            windowModel.ChartRefresh();
+            WindowModel.ChartRefresh();
         }
 
         private void ChartIndicatorComboBox_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+
+        }
+
+        private void ListViewCharts_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            UpdateColumnsWidth(sender as ListView);
+            WindowModel.UpdateChartsHeight();
 
         }
     }

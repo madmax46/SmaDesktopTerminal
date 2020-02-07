@@ -141,5 +141,126 @@
         </Style.Triggers>
     </Style>
 
+    <Style  x:Key="ButtonIndicatorRemoveStyle" TargetType="{x:Type Button}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Button}">
+                    <Border Background="{TemplateBinding Background}" BorderBrush="Transparent">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="Background">
+            <Setter.Value>
+                <ImageBrush ImageSource="..\Resources\icons8-cancel-30.png"  />
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style x:Key="ChartsListViewItemStyle" TargetType="{x:Type ListViewItem}">
+        <Style.Triggers>
+            <Trigger Property="IsSelected" Value="true" >
+                <Setter Property="Foreground" Value="White" />
+                <Setter Property="Background"  Value="Transparent"/>
+                <Setter Property="BorderThickness" Value="0" />
+
+            </Trigger>
+
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background"  Value="Transparent"/>
+                <Setter Property="Foreground"  Value="Black"/>
+            </Trigger>
+        </Style.Triggers>
+        <Style.Resources>
+            <SolidColorBrush x:Key="{x:Static SystemColors.ControlBrushKey}" Color="#00000000" />
+            <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#00000000"/>
+        </Style.Resources>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type ListViewItem}">
+                    <Border Padding="{TemplateBinding Padding}"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            SnapsToDevicePixels="true">
+                        <GridViewRowPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                              VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                              SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+
+        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+        <Setter Property="VerticalContentAlignment" Value="Stretch"/>
+        <Setter Property="VerticalAlignment" Value="Stretch"/>
+    </Style>
+
+
+    <!--<Style x:Key="TabItemStyle" TargetType="{x:Type TabItem}">
+        <Style.Triggers>
+            <Trigger Property="IsSelected" Value="true" >
+                <Setter Property="Foreground" Value="Black" />
+                <Setter Property="Background"  Value="#2e3842"/>
+            </Trigger>
+
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background"  Value="#54677a"/>
+                <Setter Property="Foreground"  Value="White"/>
+            </Trigger>
+        </Style.Triggers>
+
+        <Setter Property="Foreground" Value="#8a9ba8" />
+        <Setter Property="BorderBrush" Value="#37404a" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Background" Value="#364551"/>
+
+
+
+    </Style>-->
+
+    <Style x:Key="TabItemStyle" TargetType="{x:Type TabItem}" >
+        <!--<Setter Property="Foreground" Value="#8a9ba8" />
+        <Setter Property="BorderBrush" Value="#37404a" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Background" Value="#364551"/>
+
+
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="TabItem" >
+                    <Border Name="Border" Background="Transparent" BorderThickness="1">
+
+                        <ContentPresenter x:Name="ContentSite"
+                                          VerticalAlignment="Center"
+                                          HorizontalAlignment="Left"
+                                          ContentSource="Header"
+                                          Margin="10,3">
+                        </ContentPresenter>
+                    </Border>
+
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Border"  Property="Background"  Value="#54677a" />
+                            --><!--<Setter Property="Background"  Value="#54677a"/>--><!--
+                            <Setter TargetName="Border" Property="Foreground" Value="White"/>
+                        </Trigger>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter Property="Foreground" Value="Black" />
+                            <Setter TargetName="Border" Property="Background"  Value="#2e3842" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+
+
+            </Setter.Value>
+        </Setter>-->
+    </Style>
+
 
 </ResourceDictionary>
