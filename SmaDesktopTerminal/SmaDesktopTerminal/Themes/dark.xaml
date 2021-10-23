@@ -63,7 +63,7 @@
                     </Setter.Value>
                 </Setter>
                 <Setter Property="BorderThickness" Value="0" />
-
+                
             </Trigger>
 
             <Trigger Property="IsMouseOver" Value="True">
@@ -98,6 +98,8 @@
         </Setter>
     </Style>
 
+
+    
     <Style x:Key="GroupBoxStyle" TargetType="GroupBox">
         <Setter Property="Foreground" Value="White" />
         <Setter Property="BorderBrush" Value="#4d5862" />
